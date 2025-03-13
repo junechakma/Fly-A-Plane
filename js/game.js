@@ -126,6 +126,7 @@ var ennemiesPool = [];
 var particlesPool = [];
 var particlesInUse = [];
 var keyboardControls = { up: false, down: false, left: false, right: false };
+var highScore = 0; // Store the high score
 
 ///////////////
 
@@ -192,6 +193,39 @@ function resetGame(){
           status : "playing",
          };
   fieldLevel.innerHTML = Math.floor(game.level);
+  
+  // Load high score from localStorage
+  loadHighScore();
+}
+
+// Load high score from localStorage
+function loadHighScore() {
+  var savedHighScore = localStorage.getItem('highScore');
+  if (savedHighScore !== null) {
+    highScore = parseInt(savedHighScore);
+    updateHighScoreDisplay();
+  }
+}
+
+// Save high score to localStorage
+function saveHighScore() {
+  localStorage.setItem('highScore', highScore.toString());
+}
+
+// Update high score display
+function updateHighScoreDisplay() {
+  if (fieldHighScore) {
+    fieldHighScore.innerHTML = Math.floor(highScore);
+  }
+}
+
+// Check and update high score if needed
+function checkHighScore() {
+  if (Math.floor(game.distance) > highScore) {
+    highScore = Math.floor(game.distance);
+    saveHighScore();
+    updateHighScoreDisplay();
+  }
 }
 
 ///////////////
@@ -1099,6 +1133,9 @@ function updateDistance(){
   var d = 502*(1-(game.distance%game.distanceForLevelUpdate)/game.distanceForLevelUpdate);
   levelCircle.setAttribute("stroke-dashoffset", d);
   
+  // Check if current distance is a new high score
+  checkHighScore();
+  
   // Check if it's time to change the theme
   if (Math.floor(game.distance) % distanceForThemeChange == 0 && Math.floor(game.distance) > themeLastUpdate) {
     themeLastUpdate = Math.floor(game.distance);
@@ -1194,7 +1231,7 @@ function normalize(v,vmin,vmax,tmin, tmax){
   return tv;
 }
 
-var fieldDistance, energyBar, replayMessage, fieldLevel, levelCircle;
+var fieldDistance, energyBar, replayMessage, fieldLevel, levelCircle, fieldHighScore;
 
 function init(event){
 
@@ -1205,6 +1242,7 @@ function init(event){
   replayMessage = document.getElementById("replayMessage");
   fieldLevel = document.getElementById("levelValue");
   levelCircle = document.getElementById("levelCircleStroke");
+  fieldHighScore = document.getElementById("highScoreValue");
 
   resetGame();
   createScene();
