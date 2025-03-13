@@ -172,11 +172,38 @@
 }
 
 @media screen and (max-width: 40em) {
-	.header {
-		font-size: 0.75em;
-		top: 6.5em;
-	}
-	.header h2 {
-		letter-spacing: 0.65em;
-	}
+  .header {
+    font-size: 0.65em;
+    top: 4em;
+  }
+  .header h2 {
+    letter-spacing: 0.65em;
+  }
+  .score {
+    margin: 1em 0 0;
+  }
+  .score__content {
+    padding: 0 0.5em;
+  }
+  .message--instructions {
+    font-size: 0.7em;
+    bottom: 5vh;
+  }
+}
+
+@media screen and (max-width: 30em) {
+  .header {
+    font-size: 0.55em;
+    top: 3em;
+  }
+  .header h1 span {
+    margin: 0 0 -1.5em -5em;
+  }
+  .score__content:nth-child(2) {
+    border-right: none;
+    border-left: none;
+  }
+  .score__content {
+    padding: 0 0.3em;
+  }
 }

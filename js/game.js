@@ -139,6 +139,11 @@ function createScene() {
   
   document.addEventListener('keydown', handleKeyDown, false);
   document.addEventListener('keyup', handleKeyUp, false);
+  document.addEventListener('mousemove', handleMouseMove, false);
+  document.addEventListener('touchmove', handleTouchMove, false);
+  document.addEventListener('mouseup', handleMouseUp, false);
+  document.addEventListener('touchend', handleTouchEnd, false);
+  document.addEventListener('touchstart', handleTouchStart, false);
 
   /*
   controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -182,6 +187,13 @@ function handleMouseUp(event){
 
 
 function handleTouchEnd(event){
+  if (game.status == "waitingReplay"){
+    resetGame();
+    hideReplay();
+  }
+}
+
+function handleTouchStart(event){
   if (game.status == "waitingReplay"){
     resetGame();
     hideReplay();
@@ -837,6 +849,7 @@ function createPlane(){
   airplane = new AirPlane();
   airplane.mesh.scale.set(.25,.25,.25);
   airplane.mesh.position.y = game.planeDefaultHeight;
+  airplane.mesh.position.x = -40; 
   scene.add(airplane.mesh);
 }
 
@@ -995,13 +1008,19 @@ function removeEnergy(){
 
 function updatePlane(){
 
+  updateMousePosFromKeyboard();
+
   game.planeSpeed = normalize(mousePos.x,-.5,.5,game.planeMinSpeed, game.planeMaxSpeed);
   var targetY = normalize(mousePos.y,-.75,.75,game.planeDefaultHeight-game.planeAmpHeight, game.planeDefaultHeight+game.planeAmpHeight);
   var targetX = normalize(mousePos.x,-1,1,-game.planeAmpWidth*.7, -game.planeAmpWidth);
 
+  // Adjust for mobile - make plane more centered in the view
+  if (WIDTH < 768) {
+    targetX += 20;
+  }
+
   game.planeCollisionDisplacementX += game.planeCollisionSpeedX;
   targetX += game.planeCollisionDisplacementX;
-
 
   game.planeCollisionDisplacementY += game.planeCollisionSpeedY;
   targetY += game.planeCollisionDisplacementY;
@@ -1064,10 +1083,17 @@ function init(event){
   createEnnemies();
   createParticles();
 
+  // Add instructions for mobile
+  if ('ontouchstart' in window || navigator.maxTouchPoints) {
+    var instructions = document.getElementById("instructions");
+    instructions.innerHTML = "Swipe to control the plane<span>avoid the red ones</span>";
+  }
+
   document.addEventListener('mousemove', handleMouseMove, false);
   document.addEventListener('touchmove', handleTouchMove, false);
   document.addEventListener('mouseup', handleMouseUp, false);
   document.addEventListener('touchend', handleTouchEnd, false);
+  document.addEventListener('touchstart', handleTouchStart, false);
 
   loop();
 }
