@@ -220,49 +220,57 @@ var ModernPlane = function() {
     rightWheel.position.set(-10, -28, -25);
     this.mesh.add(rightWheel);
 
-    // Afterburner effects (for animation)
-    var geomAfterburner = new THREE.CylinderGeometry(3, 6, 10, 8, 1);
-    var matAfterburner = new THREE.MeshPhongMaterial({
-        color: Colors.yellow,
-        transparent: true,
-        opacity: 0.7,
-        shading: THREE.FlatShading
-    });
-    
-    // Left Afterburner
-    this.afterburnerLeft = new THREE.Mesh(geomAfterburner, matAfterburner);
-    this.afterburnerLeft.position.set(-27, 0, 35);
-    this.afterburnerLeft.rotation.x = Math.PI / 2;
-    this.afterburnerLeft.scale.set(0.5, 0.5, 0.5); // Start small
-    this.mesh.add(this.afterburnerLeft);
-    
-    // Right Afterburner
-    this.afterburnerRight = new THREE.Mesh(geomAfterburner, matAfterburner);
-    this.afterburnerRight.position.set(-27, 0, -35);
-    this.afterburnerRight.rotation.x = Math.PI / 2;
-    this.afterburnerRight.scale.set(0.5, 0.5, 0.5); // Start small
-    this.mesh.add(this.afterburnerRight);
-
-    // Pilot
+    // Add the pilot
     this.pilot = new Pilot();
-    this.pilot.mesh.position.set(15, 27, 0);
-    this.pilot.mesh.scale.set(0.8, 0.8, 0.8); // Slightly smaller pilot for the modern plane
+    this.pilot.mesh.position.set(-30, 25, 0);
     this.mesh.add(this.pilot.mesh);
 
-    // Set shadow properties for the entire plane
+    // Add afterburner effect
+    this.createAfterburner();
+
+    // Set shadows
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
 };
 
-// Add a method to animate the plane (similar to the original plane's propeller animation)
-ModernPlane.prototype.updateAfterburner = function() {
-    // Animate the afterburners with a pulsing effect
-    var scaleAdjust = Math.random() * 0.3;
-    this.afterburnerLeft.scale.set(0.5 + scaleAdjust, 0.5 + scaleAdjust, 0.8 + scaleAdjust);
-    this.afterburnerRight.scale.set(0.5 + scaleAdjust, 0.5 + scaleAdjust, 0.8 + scaleAdjust);
+/**
+ * Create the afterburner effect for the modern plane
+ */
+ModernPlane.prototype.createAfterburner = function() {
+    // Create afterburner geometry
+    var geomAfterburner = new THREE.CylinderGeometry(5, 8, 15, 8, 1);
+    var matAfterburner = new THREE.MeshPhongMaterial({
+        color: Colors.red,
+        transparent: true,
+        opacity: 0.8,
+        shading: THREE.FlatShading
+    });
     
-    // Update pilot's hair animation if the pilot has updateHairs method
-    if (this.pilot.updateHairs) {
-        this.pilot.updateHairs();
+    this.afterburner = new THREE.Mesh(geomAfterburner, matAfterburner);
+    this.afterburner.position.set(65, 0, 0); // Position at the back of the engine
+    this.afterburner.rotation.z = Math.PI / 2; // Rotate to align with the plane
+    this.mesh.add(this.afterburner);
+    
+    // Initialize pulse value for animation
+    this.afterburnerPulse = 0;
+};
+
+/**
+ * Update the afterburner effect animation
+ */
+ModernPlane.prototype.updateAfterburner = function() {
+    if (!this.afterburner) {
+        this.createAfterburner();
+        return;
     }
+    
+    // Animate the afterburner with a pulsing effect
+    this.afterburnerPulse += 0.1;
+    var pulseScale = 0.8 + Math.sin(this.afterburnerPulse) * 0.2;
+    
+    // Scale the afterburner for a pulsing effect
+    this.afterburner.scale.set(pulseScale, 1 + Math.sin(this.afterburnerPulse) * 0.3, pulseScale);
+    
+    // Adjust opacity for a flickering effect
+    this.afterburner.material.opacity = 0.6 + Math.sin(this.afterburnerPulse * 2) * 0.2;
 };
