@@ -20,7 +20,11 @@ var oldTime = new Date().getTime();
 var ennemiesPool = [];
 var particlesPool = [];
 var particlesInUse = [];
+var keyboardControls = { up: false, down: false, left: false, right: false };
 
+///////////////
+
+// GAME VARIABLES
 function resetGame(){
   game = {speed:0,
           initSpeed:.00035,
@@ -85,6 +89,8 @@ function resetGame(){
   fieldLevel.innerHTML = Math.floor(game.level);
 }
 
+///////////////
+
 //THREEJS RELATED VARIABLES
 
 var scene,
@@ -131,6 +137,9 @@ function createScene() {
   container.appendChild(renderer.domElement);
 
   window.addEventListener('resize', handleWindowResize, false);
+  
+  document.addEventListener('keydown', handleKeyDown, false);
+  document.addEventListener('keyup', handleKeyUp, false);
 
   /*
   controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -177,6 +186,66 @@ function handleTouchEnd(event){
   if (game.status == "waitingReplay"){
     resetGame();
     hideReplay();
+  }
+}
+
+// KEYBOARD EVENTS
+function handleKeyDown(event) {
+  switch(event.key) {
+    case 'ArrowUp':
+    case 'w':
+      keyboardControls.up = true;
+      break;
+    case 'ArrowDown':
+    case 's':
+      keyboardControls.down = true;
+      break;
+    case 'ArrowLeft':
+    case 'a':
+      keyboardControls.left = true;
+      break;
+    case 'ArrowRight':
+    case 'd':
+      keyboardControls.right = true;
+      break;
+  }
+}
+
+function handleKeyUp(event) {
+  switch(event.key) {
+    case 'ArrowUp':
+    case 'w':
+      keyboardControls.up = false;
+      break;
+    case 'ArrowDown':
+    case 's':
+      keyboardControls.down = false;
+      break;
+    case 'ArrowLeft':
+    case 'a':
+      keyboardControls.left = false;
+      break;
+    case 'ArrowRight':
+    case 'd':
+      keyboardControls.right = false;
+      break;
+  }
+}
+
+function updateMousePosFromKeyboard() {
+  const keyboardSensitivity = 0.05;
+  
+  if (keyboardControls.up) {
+    mousePos.y = Math.min(mousePos.y + keyboardSensitivity, 1);
+  }
+  if (keyboardControls.down) {
+    mousePos.y = Math.max(mousePos.y - keyboardSensitivity, -1);
+  }
+  if (keyboardControls.left) {
+    mousePos.x = Math.max(mousePos.x - keyboardSensitivity, -1);
+  }
+  if (keyboardControls.right) {
+    mousePos.x = Math.min(mousePos.x + keyboardSensitivity, 1);
   }
 }
 
@@ -817,6 +886,8 @@ function loop(){
   oldTime = newTime;
 
   if (game.status=="playing"){
+
+    updateMousePosFromKeyboard();
 
     // Add energy coins every 100m;
     if (Math.floor(game.distance)%game.distanceForCoinsSpawn == 0 && Math.floor(game.distance) > game.coinLastSpawn){
