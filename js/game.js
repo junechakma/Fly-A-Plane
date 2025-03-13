@@ -19,16 +19,16 @@ var Colors = {
     daySea: 0x1ca3ec,
     
     // Modern plane colors
-    silver: 0xC0C0C0,
-    darkGrey: 0x444444,
-    lightGrey: 0x888888,
-    black: 0x000000,
-    navy: 0x000080,
-    jetBlue: 0x0d4f8b,
-    jetRed: 0xc41e3a,
-    metallic: 0x8a9597,
-    chrome: 0xe8e8e8,
-    jetGold: 0xd4af37
+    silver: 0xD9D9D9,        // Lighter, softer silver
+    darkGrey: 0x5D5D5D,      // Warmer dark grey
+    lightGrey: 0xA8A8A8,     // Softer light grey
+    black: 0x222222,         // Softer black (very dark grey)
+    navy: 0x1A3A5A,          // Softer, more muted navy
+    jetBlue: 0x4f4e54,       // Softer blue with a hint of teal
+    jetRed: 0x4f4e54,        // Softer, more muted red
+    metallic: 0xB5BEC6,      // Softer metallic with blue undertones
+    chrome: 0xECECEC,        // Softer chrome
+    jetGold: 0xD4B86A        // Softer gold with less saturation
 };
 
 // Sky themes
@@ -1048,7 +1048,7 @@ function startGame(planeType) {
 function createPlane(){
   if (selectedPlaneType === "modern") {
     airplane = new ModernPlane();
-    airplane.mesh.scale.set(.35,.35,.35);
+    airplane.mesh.scale.set(.32,.32,.32);
   } else {
     airplane = new AirPlane();
     airplane.mesh.scale.set(.25,.25,.25);
