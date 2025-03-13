@@ -17,6 +17,18 @@ var Colors = {
     sunsetSea: 0x68c3c0,
     nightSea: 0x1a3c5e,
     daySea: 0x1ca3ec,
+    
+    // Modern plane colors
+    silver: 0xC0C0C0,
+    darkGrey: 0x444444,
+    lightGrey: 0x888888,
+    black: 0x000000,
+    navy: 0x000080,
+    jetBlue: 0x0d4f8b,
+    jetRed: 0xc41e3a,
+    metallic: 0x8a9597,
+    chrome: 0xe8e8e8,
+    jetGold: 0xd4af37
 };
 
 // Sky themes
@@ -669,7 +681,7 @@ var Sky = function(){
 }
 
 Sky.prototype.moveClouds = function(){
-  for(var i=0; i<this.nClouds; i++){
+  for (var i=0; i<this.nClouds; i++){
     var c = this.clouds[i];
     c.rotate();
   }
@@ -1036,8 +1048,7 @@ function startGame(planeType) {
 function createPlane(){
   if (selectedPlaneType === "modern") {
     airplane = new ModernPlane();
-    // Modern plane might need different scaling
-    airplane.mesh.scale.set(.25,.25,.25);
+    airplane.mesh.scale.set(.35,.35,.35);
   } else {
     airplane = new AirPlane();
     airplane.mesh.scale.set(.25,.25,.25);
@@ -1061,7 +1072,6 @@ function createSky(){
 }
 
 function createCoins(){
-
   coinsHolder = new CoinsHolder(20);
   scene.add(coinsHolder.mesh)
 }
@@ -1107,7 +1117,6 @@ function loop(){
       game.targetBaseSpeed += game.incrementSpeedByTime*deltaTime;
     }
 
-
     if (Math.floor(game.distance)%game.distanceForEnnemiesSpawn == 0 && Math.floor(game.distance) > game.ennemyLastSpawn){
       game.ennemyLastSpawn = Math.floor(game.distance);
       ennemiesHolder.spawnEnnemies();
@@ -1128,17 +1137,13 @@ function loop(){
     game.baseSpeed += (game.targetBaseSpeed - game.baseSpeed) * deltaTime * 0.02;
     game.speed = game.baseSpeed * game.planeSpeed;
 
-  }else if(game.status=="gameover"){
-    game.speed *= .99;
-    airplane.mesh.rotation.z += (-Math.PI/2 - airplane.mesh.rotation.z)*.0002*deltaTime;
-    airplane.mesh.rotation.x += 0.0003*deltaTime;
-    game.planeFallSpeed *= 1.05;
-    airplane.mesh.position.y -= game.planeFallSpeed*deltaTime;
-
-    if (airplane.mesh.position.y <-200){
+  }else if (game.status=="gameover"){
+    updatePlaneFall();
+    
+    // Once the plane is below the sea level, show the replay message
+    if (airplane.mesh.position.y < -game.seaRadius) {
       showReplay();
       game.status = "waitingReplay";
-
     }
   }else if (game.status=="waitingReplay"){
 
@@ -1407,4 +1412,23 @@ function updatePlane(){
   game.planeCollisionDisplacementY += (0-game.planeCollisionDisplacementY)*deltaTime *0.01;
 
   airplane.pilot.updateHairs();
+}
+
+function updatePlaneFall() {
+  // Gradually increase the fall speed for a more realistic effect
+  game.planeFallSpeed += 0.0001 * deltaTime;
+  
+  // Apply the fall speed to the plane's position
+  airplane.mesh.position.y -= game.planeFallSpeed * deltaTime;
+  
+  // Make the plane rotate as it falls for a more dramatic effect
+  airplane.mesh.rotation.z += 0.003 * deltaTime;
+  airplane.mesh.rotation.x += 0.002 * deltaTime;
+  
+  // Move the camera to follow the falling plane
+  camera.fov = normalize(airplane.mesh.position.y, -200, game.planeDefaultHeight, 40, 80);
+  camera.updateProjectionMatrix();
+  
+  // Slow down the game speed as the plane falls
+  game.speed *= 0.99;
 }
