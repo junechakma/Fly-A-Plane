@@ -10,7 +10,7 @@ var Colors = {
     
     // Sky theme colors
     sunsetSky: 0xf7d9aa,
-    nightSky: 0x0c1445,
+    nightSky: 0x0e546c,
     daySky: 0x87ceeb,
     
     // Sea colors for different themes
@@ -26,12 +26,16 @@ var skyThemes = [
         fogColor: Colors.sunsetSky,
         seaColor: Colors.sunsetSea,
         ambientLightColor: 0xdc8874,
-        ambientLightIntensity: 0.5,
+        ambientLightIntensity: 0.9,
         hemisphereLightColor: 0xaaaaaa,
         hemisphereLightGroundColor: 0x000000,
-        hemisphereLightIntensity: 0.9,
+        hemisphereLightIntensity: 1,
         directionalLightColor: 0xffffff,
-        directionalLightIntensity: 0.9
+        directionalLightIntensity: 0.9,
+        backgroundGradient: {
+            top: "#e4e0ba",
+            bottom: "#f7d9aa"
+        }
     },
     {
         name: "night",
@@ -43,7 +47,11 @@ var skyThemes = [
         hemisphereLightGroundColor: 0x000011,
         hemisphereLightIntensity: 0.7,
         directionalLightColor: 0xaaaaff,
-        directionalLightIntensity: 0.5
+        directionalLightIntensity: .6,
+        backgroundGradient: {
+            top: "#051428",
+            bottom: "#0e546c"
+        }
     },
     {
         name: "day",
@@ -55,12 +63,16 @@ var skyThemes = [
         hemisphereLightGroundColor: 0x88aaff,
         hemisphereLightIntensity: 1.0,
         directionalLightColor: 0xffffee,
-        directionalLightIntensity: 1.0
+        directionalLightIntensity: 1.0,
+        backgroundGradient: {
+            top: "#b4e0f3",
+            bottom: "#87ceeb"
+        }
     }
 ];
 
 var currentThemeIndex = 0;
-var distanceForThemeChange = 1000; // Change theme every 2000 distance units
+var distanceForThemeChange = 100; // Change theme every 2000 distance units
 var themeLastUpdate = 0;
 
 // Function to change the sky theme
@@ -83,6 +95,13 @@ function changeTheme(themeIndex) {
     
     shadowLight.color.setHex(theme.directionalLightColor);
     shadowLight.intensity = theme.directionalLightIntensity;
+    
+    // Update CSS background
+    var worldElement = document.getElementById('world');
+    worldElement.style.background = "linear-gradient(to bottom, " + theme.backgroundGradient.top + ", " + theme.backgroundGradient.bottom + ")";
+    worldElement.style.background = "-webkit-linear-gradient(" + theme.backgroundGradient.top + ", " + theme.backgroundGradient.bottom + ")";
+    
+    console.log("Changing theme to " + theme.name + " with background gradient from " + theme.backgroundGradient.top + " to " + theme.backgroundGradient.bottom);
     
     currentThemeIndex = themeIndex;
 }
@@ -1076,6 +1095,7 @@ function updateDistance(){
     themeLastUpdate = Math.floor(game.distance);
     // Move to the next theme in the cycle
     var nextThemeIndex = (currentThemeIndex + 1) % skyThemes.length;
+    console.log("Changing theme from " + skyThemes[currentThemeIndex].name + " to " + skyThemes[nextThemeIndex].name);
     changeTheme(nextThemeIndex);
   }
 }
