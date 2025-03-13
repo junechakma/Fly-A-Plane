@@ -7,7 +7,6 @@ var Colors = {
     pink:0xF5986E,
     yellow:0xf4ce93,
     blue:0x68c3c0,
-
 };
 
 ///////////////
@@ -233,7 +232,7 @@ function handleKeyUp(event) {
 }
 
 function updateMousePosFromKeyboard() {
-  const keyboardSensitivity = 0.05;
+  const keyboardSensitivity = 0.03;
   
   if (keyboardControls.up) {
     mousePos.y = Math.min(mousePos.y + keyboardSensitivity, 1);
