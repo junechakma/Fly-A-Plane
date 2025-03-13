@@ -23,6 +23,10 @@ var ModernPlane = function() {
     this.mesh = new THREE.Object3D();
     this.mesh.name = "modernPlane";
 
+    // Rotate the entire plane 180 degrees around Y axis
+    // This ensures the engines/propulsion are at the back when viewed in the game
+    this.mesh.rotation.y = Math.PI;
+
     // Main Fuselage (more streamlined than the original plane)
     var geomFuselage = new THREE.BoxGeometry(100, 40, 40, 1, 1, 1);
     var matFuselage = new THREE.MeshPhongMaterial({
@@ -31,6 +35,13 @@ var ModernPlane = function() {
     });
 
     // Modify vertices to create a more aerodynamic shape
+    // Front vertices (make the nose pointed)
+    geomFuselage.vertices[0].x -= 30;
+    geomFuselage.vertices[1].x -= 30;
+    geomFuselage.vertices[2].x -= 15;
+    geomFuselage.vertices[3].x -= 15;
+    
+    // Top vertices
     geomFuselage.vertices[4].y -= 5;
     geomFuselage.vertices[4].z += 10;
     geomFuselage.vertices[5].y -= 5;
@@ -39,14 +50,6 @@ var ModernPlane = function() {
     geomFuselage.vertices[6].z += 10;
     geomFuselage.vertices[7].y += 15;
     geomFuselage.vertices[7].z -= 10;
-
-    // Nose cone vertices (front)
-    geomFuselage.vertices[0].x += 30;
-    geomFuselage.vertices[1].x += 30;
-    geomFuselage.vertices[0].y += 0;
-    geomFuselage.vertices[1].y += 0;
-    geomFuselage.vertices[0].z += 0;
-    geomFuselage.vertices[1].z -= 0;
 
     var fuselage = new THREE.Mesh(geomFuselage, matFuselage);
     fuselage.castShadow = true;
@@ -71,7 +74,7 @@ var ModernPlane = function() {
     geomCockpit.vertices[5].z -= 5;
 
     var cockpit = new THREE.Mesh(geomCockpit, matCockpit);
-    cockpit.position.set(20, 25, 0);
+    cockpit.position.set(-20, 25, 0); // Moved forward (negative X)
     cockpit.castShadow = true;
     cockpit.receiveShadow = true;
     this.mesh.add(cockpit);
@@ -84,10 +87,10 @@ var ModernPlane = function() {
     });
 
     // Modify wing vertices to create a swept-back look
-    geomMainWing.vertices[0].x += 10;
-    geomMainWing.vertices[1].x += 10;
-    geomMainWing.vertices[4].x -= 10;
-    geomMainWing.vertices[5].x -= 10;
+    geomMainWing.vertices[0].x -= 10;
+    geomMainWing.vertices[1].x -= 10;
+    geomMainWing.vertices[4].x += 10;
+    geomMainWing.vertices[5].x += 10;
 
     var mainWing = new THREE.Mesh(geomMainWing, matMainWing);
     mainWing.position.set(0, 10, 0);
@@ -103,13 +106,13 @@ var ModernPlane = function() {
     });
 
     // Modify vertices for a more aerodynamic shape
-    geomTailVertical.vertices[0].x -= 5;
-    geomTailVertical.vertices[1].x -= 5;
-    geomTailVertical.vertices[4].x += 5;
-    geomTailVertical.vertices[5].x += 5;
+    geomTailVertical.vertices[0].x += 5;
+    geomTailVertical.vertices[1].x += 5;
+    geomTailVertical.vertices[4].x -= 5;
+    geomTailVertical.vertices[5].x -= 5;
 
     var tailVertical = new THREE.Mesh(geomTailVertical, matTailVertical);
-    tailVertical.position.set(-45, 20, 0);
+    tailVertical.position.set(45, 20, 0); // Moved to the back (positive X)
     tailVertical.castShadow = true;
     tailVertical.receiveShadow = true;
     this.mesh.add(tailVertical);
@@ -122,11 +125,11 @@ var ModernPlane = function() {
     });
 
     // Modify vertices for a more aerodynamic shape
-    geomTailHorizontal.vertices[0].x -= 5;
-    geomTailHorizontal.vertices[1].x -= 5;
+    geomTailHorizontal.vertices[0].x += 5;
+    geomTailHorizontal.vertices[1].x += 5;
 
     var tailHorizontal = new THREE.Mesh(geomTailHorizontal, matTailHorizontal);
-    tailHorizontal.position.set(-45, 10, 0);
+    tailHorizontal.position.set(45, 10, 0); // Moved to the back (positive X)
     tailHorizontal.castShadow = true;
     tailHorizontal.receiveShadow = true;
     this.mesh.add(tailHorizontal);
@@ -140,7 +143,7 @@ var ModernPlane = function() {
 
     // Left Engine
     var engineLeft = new THREE.Mesh(geomEngine, matEngine);
-    engineLeft.position.set(-10, 0, 35);
+    engineLeft.position.set(30, 0, 35); // Moved to the back (positive X)
     engineLeft.rotation.x = Math.PI / 2;
     engineLeft.castShadow = true;
     engineLeft.receiveShadow = true;
@@ -148,129 +151,135 @@ var ModernPlane = function() {
 
     // Right Engine
     var engineRight = new THREE.Mesh(geomEngine, matEngine);
-    engineRight.position.set(-10, 0, -35);
+    engineRight.position.set(30, 0, -35); // Moved to the back (positive X)
     engineRight.rotation.x = Math.PI / 2;
     engineRight.castShadow = true;
     engineRight.receiveShadow = true;
     this.mesh.add(engineRight);
 
-    // Engine Nozzles
-    var geomNozzle = new THREE.CylinderGeometry(6, 8, 5, 8, 1);
-    var matNozzle = new THREE.MeshPhongMaterial({
-        color: Colors.black,
+    // Afterburners (for jet engines)
+    this.afterburnerLeft = new THREE.Object3D();
+    this.afterburnerRight = new THREE.Object3D();
+    
+    // Create afterburner effect
+    var geomAfterburner = new THREE.CylinderGeometry(5, 8, 10, 8, 1);
+    var matAfterburner = new THREE.MeshPhongMaterial({
+        color: Colors.yellow,
+        transparent: true,
+        opacity: 0.7,
         shading: THREE.FlatShading
     });
+    
+    var afterburnerEffectLeft = new THREE.Mesh(geomAfterburner, matAfterburner);
+    afterburnerEffectLeft.position.set(5, 0, 0);
+    afterburnerEffectLeft.rotation.z = Math.PI / 2;
+    this.afterburnerLeft.add(afterburnerEffectLeft);
+    
+    var afterburnerEffectRight = new THREE.Mesh(geomAfterburner, matAfterburner);
+    afterburnerEffectRight.position.set(5, 0, 0);
+    afterburnerEffectRight.rotation.z = Math.PI / 2;
+    this.afterburnerRight.add(afterburnerEffectRight);
+    
+    this.afterburnerLeft.position.set(45, 0, 35); // Moved to the back (positive X)
+    this.afterburnerRight.position.set(45, 0, -35); // Moved to the back (positive X)
+    
+    this.mesh.add(this.afterburnerLeft);
+    this.mesh.add(this.afterburnerRight);
 
-    // Left Nozzle
-    var nozzleLeft = new THREE.Mesh(geomNozzle, matNozzle);
-    nozzleLeft.position.set(-22, 0, 35);
-    nozzleLeft.rotation.x = Math.PI / 2;
-    nozzleLeft.castShadow = true;
-    nozzleLeft.receiveShadow = true;
-    this.mesh.add(nozzleLeft);
-
-    // Right Nozzle
-    var nozzleRight = new THREE.Mesh(geomNozzle, matNozzle);
-    nozzleRight.position.set(-22, 0, -35);
-    nozzleRight.rotation.x = Math.PI / 2;
-    nozzleRight.castShadow = true;
-    nozzleRight.receiveShadow = true;
-    this.mesh.add(nozzleRight);
-
-    // Landing Gear - Front
-    var geomFrontGear = new THREE.BoxGeometry(5, 15, 5);
-    var matGear = new THREE.MeshPhongMaterial({
-        color: Colors.darkGrey,
-        shading: THREE.FlatShading
-    });
-    var frontGear = new THREE.Mesh(geomFrontGear, matGear);
-    frontGear.position.set(30, -20, 0);
-    this.mesh.add(frontGear);
-
-    // Front Wheel
-    var geomWheel = new THREE.CylinderGeometry(5, 5, 3, 8);
+    // Landing gear
+    var geomWheel = new THREE.CylinderGeometry(5, 5, 3, 8, 1);
     var matWheel = new THREE.MeshPhongMaterial({
         color: Colors.black,
         shading: THREE.FlatShading
     });
-    var frontWheel = new THREE.Mesh(geomWheel, matWheel);
-    frontWheel.rotation.z = Math.PI / 2;
-    frontWheel.position.set(30, -28, 0);
-    this.mesh.add(frontWheel);
+    
+    // Front wheel
+    var wheelFront = new THREE.Mesh(geomWheel, matWheel);
+    wheelFront.rotation.x = Math.PI / 2;
+    wheelFront.position.set(-30, -20, 0);
+    this.mesh.add(wheelFront);
+    
+    // Left wheel
+    var wheelLeft = new THREE.Mesh(geomWheel, matWheel);
+    wheelLeft.rotation.x = Math.PI / 2;
+    wheelLeft.position.set(20, -20, 25);
+    this.mesh.add(wheelLeft);
+    
+    // Right wheel
+    var wheelRight = new THREE.Mesh(geomWheel, matWheel);
+    wheelRight.rotation.x = Math.PI / 2;
+    wheelRight.position.set(20, -20, -25);
+    this.mesh.add(wheelRight);
+    
+    // Struts for landing gear
+    var geomStrut = new THREE.BoxGeometry(3, 20, 3, 1, 1, 1);
+    var matStrut = new THREE.MeshPhongMaterial({
+        color: Colors.silver,
+        shading: THREE.FlatShading
+    });
+    
+    // Front strut
+    var strutFront = new THREE.Mesh(geomStrut, matStrut);
+    strutFront.position.set(-30, -10, 0);
+    this.mesh.add(strutFront);
+    
+    // Left strut
+    var strutLeft = new THREE.Mesh(geomStrut, matStrut);
+    strutLeft.position.set(20, -10, 25);
+    this.mesh.add(strutLeft);
+    
+    // Right strut
+    var strutRight = new THREE.Mesh(geomStrut, matStrut);
+    strutRight.position.set(20, -10, -25);
+    this.mesh.add(strutRight);
 
-    // Landing Gear - Left
-    var leftGear = new THREE.Mesh(geomFrontGear, matGear);
-    leftGear.position.set(-10, -20, 25);
-    this.mesh.add(leftGear);
-
-    // Left Wheel
-    var leftWheel = new THREE.Mesh(geomWheel, matWheel);
-    leftWheel.rotation.z = Math.PI / 2;
-    leftWheel.position.set(-10, -28, 25);
-    this.mesh.add(leftWheel);
-
-    // Landing Gear - Right
-    var rightGear = new THREE.Mesh(geomFrontGear, matGear);
-    rightGear.position.set(-10, -20, -25);
-    this.mesh.add(rightGear);
-
-    // Right Wheel
-    var rightWheel = new THREE.Mesh(geomWheel, matWheel);
-    rightWheel.rotation.z = Math.PI / 2;
-    rightWheel.position.set(-10, -28, -25);
-    this.mesh.add(rightWheel);
-
-    // Add the pilot
+    // Add pilot
     this.pilot = new Pilot();
-    this.pilot.mesh.position.set(-30, 25, 0);
+    this.pilot.mesh.position.set(-15, 27, 0); // Moved forward (negative X)
     this.mesh.add(this.pilot.mesh);
 
-    // Add afterburner effect
-    this.createAfterburner();
-
-    // Set shadows
+    // Cast shadows
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
 };
 
-/**
- * Create the afterburner effect for the modern plane
- */
-ModernPlane.prototype.createAfterburner = function() {
-    // Create afterburner geometry
-    var geomAfterburner = new THREE.CylinderGeometry(5, 8, 15, 8, 1);
+// Create the afterburner effect for the modern plane
+var createAfterburner = function() {
+    var geomAfterburner = new THREE.CylinderGeometry(5, 8, 10, 8, 1);
     var matAfterburner = new THREE.MeshPhongMaterial({
-        color: Colors.red,
+        color: Colors.yellow,
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.7,
         shading: THREE.FlatShading
     });
     
-    this.afterburner = new THREE.Mesh(geomAfterburner, matAfterburner);
-    this.afterburner.position.set(65, 0, 0); // Position at the back of the engine
-    this.afterburner.rotation.z = Math.PI / 2; // Rotate to align with the plane
-    this.mesh.add(this.afterburner);
-    
-    // Initialize pulse value for animation
-    this.afterburnerPulse = 0;
+    return new THREE.Mesh(geomAfterburner, matAfterburner);
 };
 
-/**
- * Update the afterburner effect animation
- */
+// Update the afterburner effect animation
 ModernPlane.prototype.updateAfterburner = function() {
-    if (!this.afterburner) {
-        this.createAfterburner();
-        return;
+    // Randomly adjust the opacity for a flame effect
+    var minOpacity = 0.4;
+    var maxOpacity = 0.9;
+    
+    // Get the afterburner meshes
+    var leftBurner = this.afterburnerLeft.children[0];
+    var rightBurner = this.afterburnerRight.children[0];
+    
+    // Randomly adjust opacity for flame effect
+    if (leftBurner && leftBurner.material) {
+        leftBurner.material.opacity = minOpacity + Math.random() * (maxOpacity - minOpacity);
     }
     
-    // Animate the afterburner with a pulsing effect
-    this.afterburnerPulse += 0.1;
-    var pulseScale = 0.8 + Math.sin(this.afterburnerPulse) * 0.2;
+    if (rightBurner && rightBurner.material) {
+        rightBurner.material.opacity = minOpacity + Math.random() * (maxOpacity - minOpacity);
+    }
     
-    // Scale the afterburner for a pulsing effect
-    this.afterburner.scale.set(pulseScale, 1 + Math.sin(this.afterburnerPulse) * 0.3, pulseScale);
+    // Randomly adjust the scale for a pulsing effect
+    var minScale = 0.8;
+    var maxScale = 1.2;
+    var scale = minScale + Math.random() * (maxScale - minScale);
     
-    // Adjust opacity for a flickering effect
-    this.afterburner.material.opacity = 0.6 + Math.sin(this.afterburnerPulse * 2) * 0.2;
+    this.afterburnerLeft.scale.set(scale, scale, scale);
+    this.afterburnerRight.scale.set(scale, scale, scale);
 };
