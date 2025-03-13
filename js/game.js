@@ -989,7 +989,7 @@ CoinsHolder.prototype.rotateCoins = function(){
     if (d<game.coinDistanceTolerance){
       this.coinsPool.unshift(this.coinsInUse.splice(i,1)[0]);
       this.mesh.remove(coin.mesh);
-      particlesHolder.spawnParticles(coin.mesh.position.clone(), 5, 0x009999, .8);
+      particlesHolder.spawnParticles(coin.mesh.position.clone(), 5, 0xd2b100, .8);
       addEnergy();
       i--;
     }else if (coin.angle > Math.PI){
