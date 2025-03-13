@@ -236,6 +236,8 @@ var ModernPlane = function() {
     // Add pilot
     this.pilot = new Pilot();
     this.pilot.mesh.position.set(-15, 27, 0); // Moved forward (negative X)
+    // Rotate the pilot 180 degrees to face forward
+    this.pilot.mesh.rotation.y = Math.PI;
     this.mesh.add(this.pilot.mesh);
 
     // Cast shadows
