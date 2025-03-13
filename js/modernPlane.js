@@ -11,7 +11,13 @@ var Colors = {
     darkGrey: 0x444444,
     lightGrey: 0x888888,
     black: 0x000000,
-    navy: 0x000080
+    navy: 0x000080,
+    // Adding new colors for the modern plane
+    jetBlue: 0x0d4f8b,
+    jetRed: 0xc41e3a,
+    metallic: 0x8a9597,
+    chrome: 0xe8e8e8,
+    jetGold: 0xd4af37
 };
 
 /**
@@ -30,7 +36,7 @@ var ModernPlane = function() {
     // Main Fuselage (more streamlined than the original plane)
     var geomFuselage = new THREE.BoxGeometry(100, 40, 40, 1, 1, 1);
     var matFuselage = new THREE.MeshPhongMaterial({
-        color: Colors.silver,
+        color: Colors.jetBlue,
         shading: THREE.FlatShading
     });
 
@@ -82,7 +88,7 @@ var ModernPlane = function() {
     // Wings - Main wings are larger and more swept back
     var geomMainWing = new THREE.BoxGeometry(40, 5, 150, 1, 1, 1);
     var matMainWing = new THREE.MeshPhongMaterial({
-        color: Colors.silver,
+        color: Colors.jetRed,
         shading: THREE.FlatShading
     });
 
@@ -101,7 +107,7 @@ var ModernPlane = function() {
     // Tail - Vertical stabilizer
     var geomTailVertical = new THREE.BoxGeometry(15, 30, 5, 1, 1, 1);
     var matTailVertical = new THREE.MeshPhongMaterial({
-        color: Colors.navy,
+        color: Colors.jetRed,
         shading: THREE.FlatShading
     });
 
@@ -120,7 +126,7 @@ var ModernPlane = function() {
     // Horizontal Stabilizers
     var geomTailHorizontal = new THREE.BoxGeometry(20, 5, 60, 1, 1, 1);
     var matTailHorizontal = new THREE.MeshPhongMaterial({
-        color: Colors.silver,
+        color: Colors.jetRed,
         shading: THREE.FlatShading
     });
 
@@ -137,7 +143,7 @@ var ModernPlane = function() {
     // Engines
     var geomEngine = new THREE.CylinderGeometry(8, 10, 25, 8, 1);
     var matEngine = new THREE.MeshPhongMaterial({
-        color: Colors.darkGrey,
+        color: Colors.metallic,
         shading: THREE.FlatShading
     });
 
@@ -214,7 +220,7 @@ var ModernPlane = function() {
     // Struts for landing gear
     var geomStrut = new THREE.BoxGeometry(3, 20, 3, 1, 1, 1);
     var matStrut = new THREE.MeshPhongMaterial({
-        color: Colors.silver,
+        color: Colors.chrome,
         shading: THREE.FlatShading
     });
     

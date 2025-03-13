@@ -650,19 +650,19 @@ var AirPlane = function(){
 
 var Sky = function(){
   this.mesh = new THREE.Object3D();
-  this.nClouds = 20;
+  this.nClouds = 15;
   this.clouds = [];
   var stepAngle = Math.PI*2 / this.nClouds;
   for(var i=0; i<this.nClouds; i++){
     var c = new Cloud();
     this.clouds.push(c);
     var a = stepAngle*i;
-    var h = game.seaRadius + 150 + Math.random()*200;
+    var h = game.seaRadius + 150 + Math.random()*150;
     c.mesh.position.y = Math.sin(a)*h;
     c.mesh.position.x = Math.cos(a)*h;
-    c.mesh.position.z = -300-Math.random()*500;
+    c.mesh.position.z = -200-Math.random()*300;
     c.mesh.rotation.z = a + Math.PI/2;
-    var s = 1+Math.random()*2;
+    var s = 0.8+Math.random()*0.8;
     c.mesh.scale.set(s,s,s);
     this.mesh.add(c.mesh);
   }
@@ -726,29 +726,62 @@ Sea.prototype.moveWaves = function (){
 Cloud = function(){
   this.mesh = new THREE.Object3D();
   this.mesh.name = "cloud";
-  var geom = new THREE.CubeGeometry(20,20,20);
+  
+  // Create a more realistic cloud shape using spheres instead of cubes
+  var geomSphere = new THREE.SphereGeometry(5, 6, 6);
   var mat = new THREE.MeshPhongMaterial({
-    color:Colors.white,
-
+    color: Colors.white,
+    transparent: true,
+    opacity: 0.8,
+    flatShading: THREE.FlatShading
   });
 
-  //*
-  var nBlocs = 3+Math.floor(Math.random()*3);
-  for (var i=0; i<nBlocs; i++ ){
-    var m = new THREE.Mesh(geom.clone(), mat);
-    m.position.x = i*15;
-    m.position.y = Math.random()*10;
-    m.position.z = Math.random()*10;
-    m.rotation.z = Math.random()*Math.PI*2;
-    m.rotation.y = Math.random()*Math.PI*2;
-    var s = 1+Math.random()*2;
-    m.scale.set(s,s,s);
+  // Create a smaller, more optimized cloud with fewer elements
+  var nBlocs = 3 + Math.floor(Math.random() * 2); 
+  
+  // Create the main body of the cloud
+  for (var i = 0; i < nBlocs; i++) {
+    var m = new THREE.Mesh(geomSphere.clone(), mat);
+    
+    // Position spheres closer together for a more cohesive cloud shape
+    m.position.x = i * 16; 
+    m.position.y = Math.random() * 10; 
+    m.position.z = Math.random() * 14; 
+    
+    // Slight random rotation for natural look
+    m.rotation.z = Math.random() * Math.PI * 2;
+    m.rotation.y = Math.random() * Math.PI * 2;
+    
+    // Smaller scale for optimization
+    var s = 4 + Math.random() * 0.3; 
+    m.scale.set(s, s, s);
+    
     this.mesh.add(m);
-    m.castShadow = true;
+    
+    // Only cast shadows from the larger elements to improve performance
+    m.castShadow = s > 1.2;
     m.receiveShadow = true;
-
   }
-  //*/
+  
+  // Add some smaller spheres on top for fluffiness
+  for (var i = 0; i < Math.floor(nBlocs/2); i++) {
+    var m = new THREE.Mesh(geomSphere.clone(), mat);
+    m.position.x = (i * 8) + 4;
+    m.position.y = 5 + Math.random() * 3;
+    m.position.z = Math.random() * 5;
+    
+    var s = 0.5 + Math.random() * 0.4;
+    m.scale.set(s, s, s);
+    
+    this.mesh.add(m);
+    
+    // Small spheres don't cast shadows for better performance
+    m.castShadow = false;
+    m.receiveShadow = true;
+  }
+  
+  // Scale down the entire cloud
+  this.mesh.scale.set(0.7, 0.7, 0.7);
 }
 
 Cloud.prototype.rotate = function(){
