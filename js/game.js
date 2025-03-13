@@ -7,7 +7,85 @@ var Colors = {
     pink:0xF5986E,
     yellow:0xf4ce93,
     blue:0x68c3c0,
+    
+    // Sky theme colors
+    sunsetSky: 0xf7d9aa,
+    nightSky: 0x0c1445,
+    daySky: 0x87ceeb,
+    
+    // Sea colors for different themes
+    sunsetSea: 0x68c3c0,
+    nightSea: 0x1a3c5e,
+    daySea: 0x1ca3ec,
 };
+
+// Sky themes
+var skyThemes = [
+    {
+        name: "sunset",
+        fogColor: Colors.sunsetSky,
+        seaColor: Colors.sunsetSea,
+        ambientLightColor: 0xdc8874,
+        ambientLightIntensity: 0.5,
+        hemisphereLightColor: 0xaaaaaa,
+        hemisphereLightGroundColor: 0x000000,
+        hemisphereLightIntensity: 0.9,
+        directionalLightColor: 0xffffff,
+        directionalLightIntensity: 0.9
+    },
+    {
+        name: "night",
+        fogColor: Colors.nightSky,
+        seaColor: Colors.nightSea,
+        ambientLightColor: 0x222266,
+        ambientLightIntensity: 0.3,
+        hemisphereLightColor: 0x444466,
+        hemisphereLightGroundColor: 0x000011,
+        hemisphereLightIntensity: 0.7,
+        directionalLightColor: 0xaaaaff,
+        directionalLightIntensity: 0.5
+    },
+    {
+        name: "day",
+        fogColor: Colors.daySky,
+        seaColor: Colors.daySea,
+        ambientLightColor: 0xffffff,
+        ambientLightIntensity: 0.6,
+        hemisphereLightColor: 0xffffff,
+        hemisphereLightGroundColor: 0x88aaff,
+        hemisphereLightIntensity: 1.0,
+        directionalLightColor: 0xffffee,
+        directionalLightIntensity: 1.0
+    }
+];
+
+var currentThemeIndex = 0;
+var distanceForThemeChange = 1000; // Change theme every 2000 distance units
+var themeLastUpdate = 0;
+
+// Function to change the sky theme
+function changeTheme(themeIndex) {
+    var theme = skyThemes[themeIndex];
+    
+    // Update fog
+    scene.fog.color.setHex(theme.fogColor);
+    
+    // Update sea color
+    sea.mesh.material.color.setHex(theme.seaColor);
+    
+    // Update lights
+    ambientLight.color.setHex(theme.ambientLightColor);
+    ambientLight.intensity = theme.ambientLightIntensity;
+    
+    hemisphereLight.color.setHex(theme.hemisphereLightColor);
+    hemisphereLight.groundColor.setHex(theme.hemisphereLightGroundColor);
+    hemisphereLight.intensity = theme.hemisphereLightIntensity;
+    
+    shadowLight.color.setHex(theme.directionalLightColor);
+    shadowLight.intensity = theme.directionalLightIntensity;
+    
+    currentThemeIndex = themeIndex;
+}
 
 ///////////////
 
@@ -121,7 +199,7 @@ function createScene() {
     nearPlane,
     farPlane
     );
-  scene.fog = new THREE.Fog(0xf7d9aa, 100,950);
+  scene.fog = new THREE.Fog(skyThemes[currentThemeIndex].fogColor, 100,950);
   camera.position.x = 0;
   camera.position.z = 200;
   camera.position.y = game.planeDefaultHeight;
@@ -266,31 +344,51 @@ var ambientLight, hemisphereLight, shadowLight;
 
 function createLights() {
 
-  hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0x000000, .9)
+  // A hemisphere light is a gradient colored light; 
+  // the first parameter is the sky color, the second parameter is the ground color, 
+  // the third parameter is the intensity of the light
+  hemisphereLight = new THREE.HemisphereLight(
+    skyThemes[currentThemeIndex].hemisphereLightColor,
+    skyThemes[currentThemeIndex].hemisphereLightGroundColor,
+    skyThemes[currentThemeIndex].hemisphereLightIntensity
+  );
+  
+  // A directional light shines from a specific direction. 
+  // It acts like the sun, that means that all the rays produced are parallel. 
+  shadowLight = new THREE.DirectionalLight(
+    skyThemes[currentThemeIndex].directionalLightColor,
+    skyThemes[currentThemeIndex].directionalLightIntensity
+  );
 
-  ambientLight = new THREE.AmbientLight(0xdc8874, .5);
-
-  shadowLight = new THREE.DirectionalLight(0xffffff, .9);
+  // Set the direction of the light  
   shadowLight.position.set(150, 350, 350);
+  
+  // Allow shadow casting 
   shadowLight.castShadow = true;
+
+  // define the visible area of the projected shadow
   shadowLight.shadow.camera.left = -400;
   shadowLight.shadow.camera.right = 400;
   shadowLight.shadow.camera.top = 400;
   shadowLight.shadow.camera.bottom = -400;
   shadowLight.shadow.camera.near = 1;
   shadowLight.shadow.camera.far = 1000;
-  shadowLight.shadow.mapSize.width = 4096;
-  shadowLight.shadow.mapSize.height = 4096;
 
-  var ch = new THREE.CameraHelper(shadowLight.shadow.camera);
+  // define the resolution of the shadow; the higher the better, 
+  // but also the more expensive and less performant
+  shadowLight.shadow.mapSize.width = 2048;
+  shadowLight.shadow.mapSize.height = 2048;
+  
+  // an ambient light modifies the global color of a scene and makes the shadows softer
+  ambientLight = new THREE.AmbientLight(
+    skyThemes[currentThemeIndex].ambientLightColor,
+    skyThemes[currentThemeIndex].ambientLightIntensity
+  );
 
-  //scene.add(ch);
-  scene.add(hemisphereLight);
+  scene.add(hemisphereLight);  
   scene.add(shadowLight);
   scene.add(ambientLight);
-
 }
-
 
 var Pilot = function(){
   this.mesh = new THREE.Object3D();
@@ -576,7 +674,7 @@ Sea = function(){
                     });
   };
   var mat = new THREE.MeshPhongMaterial({
-    color:Colors.blue,
+    color:skyThemes[currentThemeIndex].seaColor,
     transparent:true,
     opacity:.8,
     shading:THREE.FlatShading,
@@ -972,7 +1070,14 @@ function updateDistance(){
   fieldDistance.innerHTML = Math.floor(game.distance);
   var d = 502*(1-(game.distance%game.distanceForLevelUpdate)/game.distanceForLevelUpdate);
   levelCircle.setAttribute("stroke-dashoffset", d);
-
+  
+  // Check if it's time to change the theme
+  if (Math.floor(game.distance) % distanceForThemeChange == 0 && Math.floor(game.distance) > themeLastUpdate) {
+    themeLastUpdate = Math.floor(game.distance);
+    // Move to the next theme in the cycle
+    var nextThemeIndex = (currentThemeIndex + 1) % skyThemes.length;
+    changeTheme(nextThemeIndex);
+  }
 }
 
 var blinkEnergy=false;
@@ -1082,18 +1187,11 @@ function init(event){
   createCoins();
   createEnnemies();
   createParticles();
-
-  // Add instructions for mobile
-  if ('ontouchstart' in window || navigator.maxTouchPoints) {
-    var instructions = document.getElementById("instructions");
-    instructions.innerHTML = "Swipe to control the plane<span>avoid the red ones</span>";
-  }
+  
+  // Apply initial theme
+  changeTheme(currentThemeIndex);
 
   document.addEventListener('mousemove', handleMouseMove, false);
-  document.addEventListener('touchmove', handleTouchMove, false);
-  document.addEventListener('mouseup', handleMouseUp, false);
-  document.addEventListener('touchend', handleTouchEnd, false);
-  document.addEventListener('touchstart', handleTouchStart, false);
 
   loop();
 }
