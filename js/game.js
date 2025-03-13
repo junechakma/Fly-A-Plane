@@ -44,7 +44,7 @@ var skyThemes = [
         ambientLightColor: 0x222266,
         ambientLightIntensity: 0.3,
         hemisphereLightColor: 0x444466,
-        hemisphereLightGroundColor: 0x000011,
+        hemisphereLightGroundColor: 0x000111,
         hemisphereLightIntensity: 0.7,
         directionalLightColor: 0xaaaaff,
         directionalLightIntensity: .6,
@@ -57,7 +57,7 @@ var skyThemes = [
         name: "day",
         fogColor: Colors.daySky,
         seaColor: Colors.daySea,
-        ambientLightColor: 0xffffff,
+        ambientLightColor: 0xb2fcf7,
         ambientLightIntensity: 0.6,
         hemisphereLightColor: 0xffffff,
         hemisphereLightGroundColor: 0x88aaff,
@@ -96,10 +96,19 @@ function changeTheme(themeIndex) {
     shadowLight.color.setHex(theme.directionalLightColor);
     shadowLight.intensity = theme.directionalLightIntensity;
     
-    // Update CSS background
+    // Update CSS background for both game-holder and world
+    var gameHolder = document.getElementById('gameHolder');
     var worldElement = document.getElementById('world');
-    worldElement.style.background = "linear-gradient(to bottom, " + theme.backgroundGradient.top + ", " + theme.backgroundGradient.bottom + ")";
-    worldElement.style.background = "-webkit-linear-gradient(" + theme.backgroundGradient.top + ", " + theme.backgroundGradient.bottom + ")";
+    
+    var linearGradient = "linear-gradient(to bottom, " + theme.backgroundGradient.top + ", " + theme.backgroundGradient.bottom + ")";
+    var webkitGradient = "-webkit-linear-gradient(" + theme.backgroundGradient.top + ", " + theme.backgroundGradient.bottom + ")";
+    
+    // Apply to game-holder (contains all UI elements)
+    gameHolder.style.background = linearGradient;
+    gameHolder.style.background = webkitGradient;
+    
+    // Clear the world background to be transparent
+    worldElement.style.background = "transparent";
     
     console.log("Changing theme to " + theme.name + " with background gradient from " + theme.backgroundGradient.top + " to " + theme.backgroundGradient.bottom);
     
@@ -341,7 +350,7 @@ function handleKeyUp(event) {
 }
 
 function updateMousePosFromKeyboard() {
-  const keyboardSensitivity = 0.03;
+  const keyboardSensitivity = 0.015;
   
   if (keyboardControls.up) {
     mousePos.y = Math.min(mousePos.y + keyboardSensitivity, 1);
@@ -886,7 +895,7 @@ ParticlesHolder.prototype.spawnParticles = function(pos, density, color, scale){
 Coin = function(){
   var geom = new THREE.TetrahedronGeometry(5,0);
   var mat = new THREE.MeshPhongMaterial({
-    color:0x009999,
+    color:0xd2b100,
     shininess:0,
     specular:0xffffff,
 
