@@ -84,7 +84,7 @@ var skyThemes = [
 ];
 
 var currentThemeIndex = 0;
-var distanceForThemeChange = 100; // Change theme every 2000 distance units
+var distanceForThemeChange = 500; // Change theme every 2000 distance units
 var themeLastUpdate = 0;
 
 // Function to change the sky theme
