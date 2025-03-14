@@ -1326,6 +1326,15 @@ function resetGame(){
     scene.remove(bulletsInUse[i].mesh);
   }
   bulletsInUse = [];
+
+  // Restart background music
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume().then(() => {
+      playBackgroundMusic();
+    });
+  } else {
+    playBackgroundMusic();
+  }
 }
 
 function showReplay(){
@@ -1418,20 +1427,28 @@ function toggleSound() {
 
 function playBackgroundMusic() {
     try {
-        if (backgroundMusicBuffer && audioContext) {
-            // Stop any existing music before creating new
-            stopBackgroundMusic();
-            
-            backgroundMusic = audioContext.createBufferSource();
-            backgroundMusic.buffer = backgroundMusicBuffer;
-            backgroundMusic.loop = true;
-            
-            // Use the persistent gain node
-            backgroundMusic.connect(gainNode);
-            
-            // Start playing
-            backgroundMusic.start(0);
+        if (!backgroundMusicBuffer || !audioContext) {
+            console.warn('Background music buffer or audio context not initialized');
+            return;
         }
+
+        // If context is suspended, resume it first
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+
+        // Stop any existing music before creating new
+        stopBackgroundMusic();
+            
+        backgroundMusic = audioContext.createBufferSource();
+        backgroundMusic.buffer = backgroundMusicBuffer;
+        backgroundMusic.loop = true;
+            
+        // Use the persistent gain node
+        backgroundMusic.connect(gainNode);
+            
+        // Start playing
+        backgroundMusic.start(0);
     } catch (error) {
         console.error('Error playing background music:', error);
     }
