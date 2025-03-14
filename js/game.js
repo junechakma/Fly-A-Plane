@@ -223,6 +223,7 @@ var audioContext, backgroundMusic, backgroundMusicBuffer;
 var collisionSound, collisionSoundBuffer;
 var gameOverSound, gameOverSoundBuffer;
 var coinSound, coinSoundBuffer;
+var fireSound, fireSoundBuffer;
 var isSoundMuted = false;
 var gainNode; // Add persistent gain node
 
@@ -1173,6 +1174,7 @@ function loop(){
       var bullet = airplane.shoot();
       scene.add(bullet.mesh);
       bulletsInUse.push(bullet);
+      playFireSound();
       lastShootTime = currentTime;
     }
 
@@ -1419,6 +1421,17 @@ function initAudio() {
                     coinSoundBuffer = audioBuffer;
                 })
                 .catch(error => console.error('Error loading coin sound:', error));
+        }
+
+        // Load fire sound if not loaded
+        if (!fireSoundBuffer) {
+            fetch('sounds/fire.mp3')
+                .then(response => response.arrayBuffer())
+                .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                .then(audioBuffer => {
+                    fireSoundBuffer = audioBuffer;
+                })
+                .catch(error => console.error('Error loading fire sound:', error));
         }
     } catch (error) {
         console.error('Audio initialization error:', error);
@@ -1676,6 +1689,7 @@ function handleMouseClick(event) {
         var bullet = airplane.shoot();
         scene.add(bullet.mesh);
         bulletsInUse.push(bullet);
+        playFireSound();
         lastShootTime = currentTime;
     }
 }
@@ -1785,5 +1799,25 @@ function playCoinSound() {
         }
     } catch (error) {
         console.error('Error playing coin sound:', error);
+    }
+}
+
+function playFireSound() {
+    try {
+        if (fireSoundBuffer && audioContext && !isSoundMuted) {
+            fireSound = audioContext.createBufferSource();
+            fireSound.buffer = fireSoundBuffer;
+            
+            // Create a separate gain node for the fire sound
+            const fireGainNode = audioContext.createGain();
+            fireGainNode.gain.value = 0.5; // Lower volume for fire sound
+            
+            fireSound.connect(fireGainNode);
+            fireGainNode.connect(audioContext.destination);
+            
+            fireSound.start(0);
+        }
+    } catch (error) {
+        console.error('Error playing fire sound:', error);
     }
 }
