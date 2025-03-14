@@ -218,6 +218,10 @@ var scene,
     container,
     controls;
 
+// Add audio variables
+var audioContext, backgroundMusic, backgroundMusicBuffer;
+var isSoundMuted = false;
+
 //SCREEN & MOUSE VARIABLES
 
 var HEIGHT, WIDTH,
@@ -1339,6 +1343,66 @@ function normalize(v,vmin,vmax,tmin, tmax){
 
 var fieldDistance, energyBar, replayMessage, fieldLevel, levelCircle, fieldHighScore;
 
+function initAudio() {
+    // Create audio context
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Load background music
+    fetch('sounds/background.mp3')
+        .then(response => response.arrayBuffer())
+        .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+        .then(audioBuffer => {
+            backgroundMusicBuffer = audioBuffer;
+            playBackgroundMusic();
+        })
+        .catch(error => console.error('Error loading background music:', error));
+}
+
+function toggleSound() {
+    isSoundMuted = !isSoundMuted;
+    const soundButton = document.getElementById('soundButton');
+    
+    if (soundButton) {
+        soundButton.innerHTML = isSoundMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+    }
+    
+    if (audioContext) {
+        const gainNode = audioContext.createGain();
+        gainNode.gain.value = isSoundMuted ? 0 : 0.5;
+        
+        if (backgroundMusic) {
+            backgroundMusic.disconnect();
+            backgroundMusic.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+        }
+    }
+}
+
+function playBackgroundMusic() {
+    if (backgroundMusicBuffer && audioContext) {
+        backgroundMusic = audioContext.createBufferSource();
+        backgroundMusic.buffer = backgroundMusicBuffer;
+        backgroundMusic.loop = true;
+        
+        // Create gain node for volume control
+        const gainNode = audioContext.createGain();
+        gainNode.gain.value = isSoundMuted ? 0 : 0.5; // Set volume based on mute state
+        
+        // Connect nodes
+        backgroundMusic.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // Start playing
+        backgroundMusic.start(0);
+    }
+}
+
+function stopBackgroundMusic() {
+    if (backgroundMusic) {
+        backgroundMusic.stop();
+    }
+}
+
 function init(event){
 
   // UI
@@ -1353,6 +1417,7 @@ function init(event){
   // Add event listeners for pause and exit buttons
   const pauseButton = document.getElementById('pauseButton');
   const exitButton = document.getElementById('exitButton');
+  const soundButton = document.getElementById('soundButton');
   
   if (pauseButton) {
     pauseButton.addEventListener('click', togglePause);
@@ -1360,6 +1425,12 @@ function init(event){
   if (exitButton) {
     exitButton.addEventListener('click', exitGame);
   }
+  if (soundButton) {
+    soundButton.addEventListener('click', toggleSound);
+  }
+
+  // Initialize audio
+  initAudio();
 
   resetGame();
   createScene();
@@ -1545,9 +1616,22 @@ function togglePause() {
     if (pauseButton) {
         pauseButton.innerHTML = isPaused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
     }
+    if (isPaused) {
+        if (audioContext) {
+            audioContext.suspend();
+        }
+    } else {
+        if (audioContext) {
+            audioContext.resume();
+        }
+    }
 }
 
 function exitGame() {
+    if (audioContext) {
+        stopBackgroundMusic();
+        audioContext.close();
+    }
     // Reset game state
     resetGame();
     // Show plane selection screen
