@@ -291,3 +291,27 @@ ModernPlane.prototype.updateAfterburner = function() {
     this.afterburnerLeft.scale.set(scale, scale, scale);
     this.afterburnerRight.scale.set(scale, scale, scale);
 };
+
+// Bullet class for shooting mechanics
+var Bullet = function() {
+    var geomBullet = new THREE.SphereGeometry(2, 8, 8);
+    var matBullet = new THREE.MeshPhongMaterial({
+        color: Colors.red,  // Changed to red to match obstacles
+        shading: THREE.FlatShading
+    });
+    this.mesh = new THREE.Mesh(geomBullet, matBullet);
+    this.mesh.castShadow = true;
+    this.mesh.receiveShadow = true;
+    this.speed = 0.5; // Reduced from 2 to 0.5 for slower bullets
+    this.active = true;
+};
+
+// Add shooting mechanics to ModernPlane
+ModernPlane.prototype.shoot = function() {
+    var bullet = new Bullet();
+    // Position the bullet at the front of the plane
+    bullet.mesh.position.copy(this.mesh.position);
+    bullet.mesh.position.x += 50; // Changed from -50 to +50 to shoot forward
+    bullet.mesh.position.y += 10; // Slight upward angle
+    return bullet;
+};

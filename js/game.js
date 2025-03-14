@@ -137,9 +137,13 @@ var oldTime = new Date().getTime();
 var ennemiesPool = [];
 var particlesPool = [];
 var particlesInUse = [];
-var keyboardControls = { up: false, down: false, left: false, right: false };
+var bulletsPool = []; // Pool for bullet objects
+var bulletsInUse = []; // Active bullets
+var keyboardControls = { up: false, down: false, left: false, right: false, shoot: false };
 var highScore = 0; // Store the high score
 var selectedPlaneType = "classic"; // Default plane type
+var lastShootTime = 0; // Add cooldown tracking
+var shootCooldown = 500; // Cooldown in milliseconds (0.5 seconds)
 
 // Initialize game object with default values
 game = {
@@ -334,6 +338,10 @@ function handleKeyDown(event) {
     case 'd':
       keyboardControls.right = true;
       break;
+    case ' ':
+    case 'Spacebar':
+      keyboardControls.shoot = true;
+      break;
   }
 }
 
@@ -354,6 +362,10 @@ function handleKeyUp(event) {
     case 'ArrowRight':
     case 'd':
       keyboardControls.right = false;
+      break;
+    case ' ':
+    case 'Spacebar':
+      keyboardControls.shoot = false;
       break;
   }
 }
@@ -1137,6 +1149,15 @@ function loop(){
     game.baseSpeed += (game.targetBaseSpeed - game.baseSpeed) * deltaTime * 0.02;
     game.speed = game.baseSpeed * game.planeSpeed;
 
+    // Handle shooting with cooldown
+    var currentTime = new Date().getTime();
+    if (keyboardControls.shoot && selectedPlaneType === "modern" && currentTime - lastShootTime >= shootCooldown) {
+      var bullet = airplane.shoot();
+      scene.add(bullet.mesh);
+      bulletsInUse.push(bullet);
+      lastShootTime = currentTime;
+    }
+
   }else if (game.status=="gameover"){
     updatePlaneFall();
     
@@ -1169,6 +1190,8 @@ function loop(){
 
   sky.moveClouds();
   sea.moveWaves();
+
+  updateBullets();
 
   renderer.render(scene, camera);
   requestAnimationFrame(loop);
@@ -1276,6 +1299,12 @@ function resetGame(){
   
   // Load high score
   loadHighScore();
+
+  // Clear bullets
+  for (var i = 0; i < bulletsInUse.length; i++) {
+    scene.remove(bulletsInUse[i].mesh);
+  }
+  bulletsInUse = [];
 }
 
 function showReplay(){
@@ -1432,3 +1461,56 @@ function updatePlaneFall() {
   // Slow down the game speed as the plane falls
   game.speed *= 0.99;
 }
+
+// Modify the updateBullets function
+function updateBullets() {
+    for (var i = bulletsInUse.length - 1; i >= 0; i--) {
+        var bullet = bulletsInUse[i];
+        if (!bullet.active) {
+            bulletsPool.push(bulletsInUse.splice(i, 1)[0]);
+            scene.remove(bullet.mesh);
+            continue;
+        }
+
+        // Move bullet forward (changed from negative to positive)
+        bullet.mesh.position.x += bullet.speed * deltaTime;
+
+        // Check for collisions with enemies
+        for (var j = ennemiesHolder.ennemiesInUse.length - 1; j >= 0; j--) {
+            var enemy = ennemiesHolder.ennemiesInUse[j];
+            var distance = bullet.mesh.position.distanceTo(enemy.mesh.position);
+            
+            if (distance < game.ennemyDistanceTolerance) {
+                // Hit enemy
+                particlesHolder.spawnParticles(enemy.mesh.position.clone(), 15, Colors.red, 3);
+                bulletsPool.push(bulletsInUse.splice(i, 1)[0]);
+                scene.remove(bullet.mesh);
+                ennemiesPool.push(ennemiesHolder.ennemiesInUse.splice(j, 1)[0]);
+                ennemiesHolder.mesh.remove(enemy.mesh);
+                break;
+            }
+        }
+
+        // Remove bullets that go off screen (changed from -1000 to 1000)
+        if (bullet.mesh.position.x > 1000) {
+            bullet.active = false;
+        }
+    }
+}
+
+// Modify the handleMouseClick function to include cooldown
+function handleMouseClick(event) {
+    var currentTime = new Date().getTime();
+    if (game.status === "playing" && selectedPlaneType === "modern" && currentTime - lastShootTime >= shootCooldown) {
+        var bullet = airplane.shoot();
+        scene.add(bullet.mesh);
+        bulletsInUse.push(bullet);
+        lastShootTime = currentTime;
+    }
+}
+
+// Add event listeners
+document.addEventListener('click', handleMouseClick);
+
+// Initialize bullets
+createBullets();
