@@ -77,8 +77,8 @@ var skyThemes = [
         directionalLightColor: 0xffffee,
         directionalLightIntensity: 0.7,
         backgroundGradient: {
-            top: "#a8d0e3",
-            bottom: "#7ab8d9"
+            top: "#b8e0f3",    // Brighter, more vibrant blue
+            bottom: "#89cff0"  // Lighter, sunnier blue
         }
     }
 ];
@@ -1265,6 +1265,9 @@ function resetGame(){
   game.speedLastUpdate = 0;
   game.ennemyLastSpawn = 0;
   game.levelLastUpdate = 0;
+  
+  // Reset theme change tracking
+  themeLastUpdate = 0;
   
   // Update UI elements if they exist
   if (fieldDistance) fieldDistance.innerHTML = "0";
