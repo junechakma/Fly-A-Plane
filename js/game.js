@@ -221,6 +221,7 @@ var scene,
 // Add audio variables
 var audioContext, backgroundMusic, backgroundMusicBuffer;
 var isSoundMuted = false;
+var gainNode; // Add persistent gain node
 
 //SCREEN & MOUSE VARIABLES
 
@@ -1051,7 +1052,7 @@ function startGame(planeType) {
     planeSelection.style.display = 'none';
   }
 
-  // Show the pause and exit buttons
+  // Show the game controls
   const gameControls = document.querySelector('.game-controls');
   if (gameControls) {
     gameControls.style.display = 'flex';
@@ -1064,10 +1065,10 @@ function startGame(planeType) {
     // If the game was already initialized but paused for plane selection
     resetGame();
     hideReplay();
-    
-    // Replace the current plane with the selected type
     scene.remove(airplane.mesh);
     createPlane();
+    // Restart music
+    initAudio();
   }
 }
 
@@ -1344,18 +1345,38 @@ function normalize(v,vmin,vmax,tmin, tmax){
 var fieldDistance, energyBar, replayMessage, fieldLevel, levelCircle, fieldHighScore;
 
 function initAudio() {
-    // Create audio context
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // Load background music
-    fetch('sounds/background.mp3')
-        .then(response => response.arrayBuffer())
-        .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-        .then(audioBuffer => {
-            backgroundMusicBuffer = audioBuffer;
+    try {
+        // Create audio context only if it doesn't exist or is closed
+        if (!audioContext || audioContext.state === 'closed') {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            // Create a persistent gain node
+            gainNode = audioContext.createGain();
+            gainNode.gain.value = isSoundMuted ? 0 : 0.5;
+            gainNode.connect(audioContext.destination);
+        }
+        
+        // If context is suspended, resume it
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+        
+        // Only load and start music if we haven't loaded it before
+        if (!backgroundMusicBuffer) {
+            fetch('sounds/background.mp3')
+                .then(response => response.arrayBuffer())
+                .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                .then(audioBuffer => {
+                    backgroundMusicBuffer = audioBuffer;
+                    playBackgroundMusic();
+                })
+                .catch(error => console.error('Error loading background music:', error));
+        } else {
+            // If we already have the buffer, just play the music
             playBackgroundMusic();
-        })
-        .catch(error => console.error('Error loading background music:', error));
+        }
+    } catch (error) {
+        console.error('Audio initialization error:', error);
+    }
 }
 
 function toggleSound() {
@@ -1366,40 +1387,41 @@ function toggleSound() {
         soundButton.innerHTML = isSoundMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
     }
     
-    if (audioContext) {
-        const gainNode = audioContext.createGain();
+    if (gainNode) {
         gainNode.gain.value = isSoundMuted ? 0 : 0.5;
-        
-        if (backgroundMusic) {
-            backgroundMusic.disconnect();
-            backgroundMusic.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-        }
     }
 }
 
 function playBackgroundMusic() {
-    if (backgroundMusicBuffer && audioContext) {
-        backgroundMusic = audioContext.createBufferSource();
-        backgroundMusic.buffer = backgroundMusicBuffer;
-        backgroundMusic.loop = true;
-        
-        // Create gain node for volume control
-        const gainNode = audioContext.createGain();
-        gainNode.gain.value = isSoundMuted ? 0 : 0.5; // Set volume based on mute state
-        
-        // Connect nodes
-        backgroundMusic.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        // Start playing
-        backgroundMusic.start(0);
+    try {
+        if (backgroundMusicBuffer && audioContext) {
+            // Stop any existing music before creating new
+            stopBackgroundMusic();
+            
+            backgroundMusic = audioContext.createBufferSource();
+            backgroundMusic.buffer = backgroundMusicBuffer;
+            backgroundMusic.loop = true;
+            
+            // Use the persistent gain node
+            backgroundMusic.connect(gainNode);
+            
+            // Start playing
+            backgroundMusic.start(0);
+        }
+    } catch (error) {
+        console.error('Error playing background music:', error);
     }
 }
 
 function stopBackgroundMusic() {
-    if (backgroundMusic) {
-        backgroundMusic.stop();
+    try {
+        if (backgroundMusic) {
+            backgroundMusic.stop();
+            backgroundMusic.disconnect();
+            backgroundMusic = null;
+        }
+    } catch (error) {
+        console.error('Error stopping background music:', error);
     }
 }
 
@@ -1628,10 +1650,8 @@ function togglePause() {
 }
 
 function exitGame() {
-    if (audioContext) {
-        stopBackgroundMusic();
-        audioContext.close();
-    }
+    stopBackgroundMusic();
+    
     // Reset game state
     resetGame();
     // Show plane selection screen
