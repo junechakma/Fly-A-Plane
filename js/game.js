@@ -144,6 +144,7 @@ var highScore = 0; // Store the high score
 var selectedPlaneType = "classic"; // Default plane type
 var lastShootTime = 0; // Add cooldown tracking
 var shootCooldown = 500; // Cooldown in milliseconds (0.5 seconds)
+var isPaused = false; // Add pause state
 
 // Initialize game object with default values
 game = {
@@ -1041,7 +1042,16 @@ function startGame(planeType) {
   }
   
   // Hide the plane selection screen
-  document.getElementById('planeSelection').classList.add('hidden');
+  const planeSelection = document.getElementById('planeSelection');
+  if (planeSelection) {
+    planeSelection.style.display = 'none';
+  }
+
+  // Show the pause and exit buttons
+  const gameControls = document.querySelector('.game-controls');
+  if (gameControls) {
+    gameControls.style.display = 'flex';
+  }
   
   // Start the game if it hasn't already been initialized
   if (!airplane) {
@@ -1114,7 +1124,7 @@ function loop(){
   deltaTime = newTime-oldTime;
   oldTime = newTime;
 
-  if (game.status=="playing"){
+  if (game.status=="playing" && !isPaused){
 
     updateMousePosFromKeyboard();
 
@@ -1185,13 +1195,13 @@ function loop(){
 
   ambientLight.intensity += (.5 - ambientLight.intensity)*deltaTime*0.005;
 
-  coinsHolder.rotateCoins();
-  ennemiesHolder.rotateEnnemies();
-
-  sky.moveClouds();
-  sea.moveWaves();
-
-  updateBullets();
+  if (!isPaused) {
+    coinsHolder.rotateCoins();
+    ennemiesHolder.rotateEnnemies();
+    sky.moveClouds();
+    sea.moveWaves();
+    updateBullets();
+  }
 
   renderer.render(scene, camera);
   requestAnimationFrame(loop);
@@ -1339,6 +1349,17 @@ function init(event){
   fieldLevel = document.getElementById("levelValue");
   levelCircle = document.getElementById("levelCircleStroke");
   fieldHighScore = document.getElementById("highScoreValue");
+
+  // Add event listeners for pause and exit buttons
+  const pauseButton = document.getElementById('pauseButton');
+  const exitButton = document.getElementById('exitButton');
+  
+  if (pauseButton) {
+    pauseButton.addEventListener('click', togglePause);
+  }
+  if (exitButton) {
+    exitButton.addEventListener('click', exitGame);
+  }
 
   resetGame();
   createScene();
@@ -1517,3 +1538,34 @@ document.addEventListener('click', handleMouseClick);
 
 // Initialize bullets
 createBullets();
+
+function togglePause() {
+    isPaused = !isPaused;
+    const pauseButton = document.getElementById('pauseButton');
+    if (pauseButton) {
+        pauseButton.textContent = isPaused ? '▶️' : '⏸️';
+    }
+}
+
+function exitGame() {
+    // Reset game state
+    resetGame();
+    // Show plane selection screen
+    const planeSelection = document.getElementById('planeSelection');
+    if (planeSelection) {
+        planeSelection.style.display = 'flex';
+    }
+    // Hide game controls
+    const gameControls = document.querySelector('.game-controls');
+    if (gameControls) {
+        gameControls.style.display = 'none';
+    }
+    // Hide replay message if visible
+    hideReplay();
+    // Reset pause state
+    isPaused = false;
+    const pauseButton = document.getElementById('pauseButton');
+    if (pauseButton) {
+        pauseButton.textContent = '⏸️';
+    }
+}

@@ -212,3 +212,40 @@
     padding: 0 0.3em;
   }
 }
+
+.game-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 0.5em;
+    z-index: 1000;
+}
+
+.control-button {
+    padding: 0.4em;
+    font-size: 1.2em;
+    background-color: rgba(209, 183, 144, 0.6);
+    border: 1px solid #d1b790;
+    border-radius: 4px;
+    color: #d1b790;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-button:hover {
+    background-color: rgba(209, 183, 144, 0.8);
+    transform: scale(1.1);
+}
+
+.control-button:active {
+    transform: scale(0.95);
+}
