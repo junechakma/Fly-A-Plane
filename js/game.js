@@ -152,8 +152,8 @@ game = {
   initSpeed: 0.00035,
   baseSpeed: 0.00035,
   targetBaseSpeed: 0.00035,
-  incrementSpeedByTime: 0.0000025,
-  incrementSpeedByLevel: 0.000005,
+  incrementSpeedByTime: 0.0000015,
+  incrementSpeedByLevel: 0.000003,
   distanceForSpeedUpdate: 100,
   speedLastUpdate: 0,
 
@@ -164,7 +164,7 @@ game = {
 
   level: 1,
   levelLastUpdate: 0,
-  distanceForLevelUpdate: 1000,
+  distanceForLevelUpdate: 1500,
 
   planeDefaultHeight: 100,
   planeAmpHeight: 80,
@@ -847,7 +847,9 @@ EnnemiesHolder = function (){
 }
 
 EnnemiesHolder.prototype.spawnEnnemies = function(){
-  var nEnnemies = game.level;
+  // Cap the number of enemies based on level
+  var maxEnemies = Math.min(game.level, 5);  // Cap at 5 enemies max
+  var nEnnemies = maxEnemies;
 
   for (var i=0; i<nEnnemies; i++){
     var ennemy;

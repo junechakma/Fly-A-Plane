@@ -57,6 +57,7 @@
     max-width: 120px;
     height: auto;
     object-fit: contain;
+    border-radius: 10px;
 }
 
 .plane-name {
