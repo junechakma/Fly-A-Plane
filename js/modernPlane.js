@@ -341,7 +341,7 @@ ModernPlane.prototype.shoot = function() {
     var bullet = new Bullet();
     // Position the bullet at the front of the plane
     bullet.mesh.position.copy(this.mesh.position);
-    bullet.mesh.position.x += 50; // Changed from -50 to +50 to shoot forward
-    bullet.mesh.position.y += 10; // Slight upward angle
+    bullet.mesh.position.x += 15; // Changed from -50 to +50 to shoot forward
+    bullet.mesh.position.y += 0; // Slight upward angle
     return bullet;
 };
