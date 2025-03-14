@@ -220,6 +220,8 @@ var scene,
 
 // Add audio variables
 var audioContext, backgroundMusic, backgroundMusicBuffer;
+var collisionSound, collisionSoundBuffer;
+var gameOverSound, gameOverSoundBuffer;
 var isSoundMuted = false;
 var gainNode; // Add persistent gain node
 
@@ -875,11 +877,11 @@ EnnemiesHolder.prototype.rotateEnnemies = function(){
     ennemy.mesh.rotation.z += Math.random()*.1;
     ennemy.mesh.rotation.y += Math.random()*.1;
 
-    //var globalEnnemyPosition =  ennemy.mesh.localToWorld(new THREE.Vector3());
     var diffPos = airplane.mesh.position.clone().sub(ennemy.mesh.position.clone());
     var d = diffPos.length();
     if (d<game.ennemyDistanceTolerance){
       particlesHolder.spawnParticles(ennemy.mesh.position.clone(), 15, Colors.red, 3);
+      playCollisionSound();
 
       ennemiesPool.unshift(this.ennemiesInUse.splice(i,1)[0]);
       this.mesh.remove(ennemy.mesh);
@@ -1007,7 +1009,6 @@ CoinsHolder.prototype.rotateCoins = function(){
     coin.mesh.rotation.z += Math.random()*.1;
     coin.mesh.rotation.y += Math.random()*.1;
 
-    //var globalCoinPosition =  coin.mesh.localToWorld(new THREE.Vector3());
     var diffPos = airplane.mesh.position.clone().sub(coin.mesh.position.clone());
     var d = diffPos.length();
     if (d<game.coinDistanceTolerance){
@@ -1245,8 +1246,10 @@ function updateEnergy(){
     energyBar.style.animationName = "none";
   }
 
-  if (game.energy <1){
+  if (game.energy < 1){
     game.status = "gameover";
+    playGameOverSound();
+    stopBackgroundMusic();
   }
 }
 
@@ -1360,7 +1363,7 @@ function initAudio() {
             audioContext.resume();
         }
         
-        // Only load and start music if we haven't loaded it before
+        // Load background music if not loaded
         if (!backgroundMusicBuffer) {
             fetch('sounds/background.mp3')
                 .then(response => response.arrayBuffer())
@@ -1371,8 +1374,29 @@ function initAudio() {
                 })
                 .catch(error => console.error('Error loading background music:', error));
         } else {
-            // If we already have the buffer, just play the music
             playBackgroundMusic();
+        }
+
+        // Load collision sound if not loaded
+        if (!collisionSoundBuffer) {
+            fetch('sounds/collision.mp3')
+                .then(response => response.arrayBuffer())
+                .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                .then(audioBuffer => {
+                    collisionSoundBuffer = audioBuffer;
+                })
+                .catch(error => console.error('Error loading collision sound:', error));
+        }
+
+        // Load game over sound if not loaded
+        if (!gameOverSoundBuffer) {
+            fetch('sounds/game-over.mp3')
+                .then(response => response.arrayBuffer())
+                .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                .then(audioBuffer => {
+                    gameOverSoundBuffer = audioBuffer;
+                })
+                .catch(error => console.error('Error loading game over sound:', error));
         }
     } catch (error) {
         console.error('Audio initialization error:', error);
@@ -1671,5 +1695,45 @@ function exitGame() {
     const pauseButton = document.getElementById('pauseButton');
     if (pauseButton) {
         pauseButton.innerHTML = '<i class="fas fa-pause"></i>';
+    }
+}
+
+function playCollisionSound() {
+    try {
+        if (collisionSoundBuffer && audioContext && !isSoundMuted) {
+            collisionSound = audioContext.createBufferSource();
+            collisionSound.buffer = collisionSoundBuffer;
+            
+            // Create a separate gain node for the collision sound
+            const collisionGainNode = audioContext.createGain();
+            collisionGainNode.gain.value = 0.4; // Slightly lower volume for sound effect
+            
+            collisionSound.connect(collisionGainNode);
+            collisionGainNode.connect(audioContext.destination);
+            
+            collisionSound.start(0);
+        }
+    } catch (error) {
+        console.error('Error playing collision sound:', error);
+    }
+}
+
+function playGameOverSound() {
+    try {
+        if (gameOverSoundBuffer && audioContext && !isSoundMuted) {
+            gameOverSound = audioContext.createBufferSource();
+            gameOverSound.buffer = gameOverSoundBuffer;
+            
+            // Create a separate gain node for the game over sound
+            const gameOverGainNode = audioContext.createGain();
+            gameOverGainNode.gain.value = 0.6; // Slightly louder than collision sound
+            
+            gameOverSound.connect(gameOverGainNode);
+            gameOverGainNode.connect(audioContext.destination);
+            
+            gameOverSound.start(0);
+        }
+    } catch (error) {
+        console.error('Error playing game over sound:', error);
     }
 }
