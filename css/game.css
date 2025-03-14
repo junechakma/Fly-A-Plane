@@ -227,10 +227,10 @@
 .control-button {
     padding: 0.4em;
     font-size: 1.2em;
-    background-color: rgba(209, 183, 144, 0.6);
+    background-color: rgba(209, 183, 144, 0.612);
     border: 1px solid #d1b790;
     border-radius: 4px;
-    color: #d1b790;
+    color: #ccaa76;
     cursor: pointer;
     transition: all 0.3s ease;
     pointer-events: auto;
