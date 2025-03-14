@@ -16,7 +16,7 @@ var Colors = {
     // Sea colors for different themes
     sunsetSea: 0x68c3c0,
     nightSea: 0x1a3c5e,
-    daySea: 0x1ca3ec,
+    daySea: 0x68c3c0,  // Restored to the original color
     
     // Modern plane colors
     silver: 0xD9D9D9,        // Lighter, softer silver
@@ -69,16 +69,16 @@ var skyThemes = [
         name: "day",
         fogColor: Colors.daySky,
         seaColor: Colors.daySea,
-        ambientLightColor: 0xb2fcf7,
-        ambientLightIntensity: 0.6,
+        ambientLightColor: 0x8a9597,
+        ambientLightIntensity: 0.4,
         hemisphereLightColor: 0xffffff,
         hemisphereLightGroundColor: 0x88aaff,
-        hemisphereLightIntensity: 1.0,
+        hemisphereLightIntensity: 0.7,
         directionalLightColor: 0xffffee,
-        directionalLightIntensity: 1.0,
+        directionalLightIntensity: 0.7,
         backgroundGradient: {
-            top: "#b4e0f3",
-            bottom: "#87ceeb"
+            top: "#a8d0e3",
+            bottom: "#7ab8d9"
         }
     }
 ];
