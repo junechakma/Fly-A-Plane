@@ -222,6 +222,7 @@ var scene,
 var audioContext, backgroundMusic, backgroundMusicBuffer;
 var collisionSound, collisionSoundBuffer;
 var gameOverSound, gameOverSoundBuffer;
+var coinSound, coinSoundBuffer;
 var isSoundMuted = false;
 var gainNode; // Add persistent gain node
 
@@ -1015,6 +1016,7 @@ CoinsHolder.prototype.rotateCoins = function(){
       this.coinsPool.unshift(this.coinsInUse.splice(i,1)[0]);
       this.mesh.remove(coin.mesh);
       particlesHolder.spawnParticles(coin.mesh.position.clone(), 5, 0xd2b100, .8);
+      playCoinSound();
       addEnergy();
       i--;
     }else if (coin.angle > Math.PI){
@@ -1407,6 +1409,17 @@ function initAudio() {
                 })
                 .catch(error => console.error('Error loading game over sound:', error));
         }
+
+        // Load coin sound if not loaded
+        if (!coinSoundBuffer) {
+            fetch('sounds/coin.mp3')
+                .then(response => response.arrayBuffer())
+                .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                .then(audioBuffer => {
+                    coinSoundBuffer = audioBuffer;
+                })
+                .catch(error => console.error('Error loading coin sound:', error));
+        }
     } catch (error) {
         console.error('Audio initialization error:', error);
     }
@@ -1752,5 +1765,25 @@ function playGameOverSound() {
         }
     } catch (error) {
         console.error('Error playing game over sound:', error);
+    }
+}
+
+function playCoinSound() {
+    try {
+        if (coinSoundBuffer && audioContext && !isSoundMuted) {
+            coinSound = audioContext.createBufferSource();
+            coinSound.buffer = coinSoundBuffer;
+            
+            // Create a separate gain node for the coin sound
+            const coinGainNode = audioContext.createGain();
+            coinGainNode.gain.value = 0.3; // Lower volume for coin sound
+            
+            coinSound.connect(coinGainNode);
+            coinGainNode.connect(audioContext.destination);
+            
+            coinSound.start(0);
+        }
+    } catch (error) {
+        console.error('Error playing coin sound:', error);
     }
 }
