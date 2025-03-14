@@ -5,10 +5,12 @@
     width: 100%;
     height: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     background: rgba(0, 0, 0, 0.7);
     z-index: 1000;
+    padding: 2rem 0;
 }
 
 .plane-options {
@@ -19,6 +21,7 @@
     justify-content: center;
     max-width: 800px;
     width: 100%;
+    margin-top: 2rem;
 }
 
 .plane-option {
@@ -30,7 +33,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     flex: 1;
-    min-width: 180px;
+    min-width: 250px;
     max-width: 250px;
     backdrop-filter: blur(5px);
 }
@@ -67,7 +70,7 @@
 
 .plane-feature {
     font-size: 0.7em;
-    color: #d6483b;
+    color: #68c3c0;
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -121,9 +124,54 @@
     font-weight: bold;
 }
 
+.how-to-play {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    padding: 1rem;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.how-to-play h2 {
+    font-family: 'Playfair Display';
+    font-size: 1.6em;
+    color: #d1b790;
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.instructions-list {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 1rem;
+    margin: 0 auto;
+    max-width: 500px;
+}
+
+.instructions-list p {
+    font-family: 'Playfair Display';
+    font-size: 0.95em;
+    color: #d1b790;
+    margin: 0.5rem 0;
+    line-height: 1.4;
+    text-align: left;
+    padding-left: 1rem;
+    position: relative;
+}
+
 @media screen and (max-width: 480px) {
+    .plane-selection {
+        padding: 1rem 0;
+    }
+
+    .plane-options {
+        margin-top: 1rem;
+    }
+
     .plane-option {
-        min-width: 140px;
+        min-width: 120px;
         padding: 0.6rem;
     }
 
@@ -146,5 +194,25 @@
 
     .high-score-display {
         font-size: 1em;
+    }
+
+    .how-to-play {
+        margin-top: 1rem;
+        padding: 0.5rem;
+    }
+
+    .how-to-play h2 {
+        font-size: .8em;
+        margin-bottom: 0.6rem;
+    }
+
+    .instructions-list {
+        padding: 0.8rem;
+        margin: 0 1rem;
+    }
+
+    .instructions-list p {
+        font-size: 0.8em;
+        margin: 0.4rem 0;
     }
 }

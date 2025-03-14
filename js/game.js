@@ -1543,7 +1543,7 @@ function togglePause() {
     isPaused = !isPaused;
     const pauseButton = document.getElementById('pauseButton');
     if (pauseButton) {
-        pauseButton.textContent = isPaused ? '▶️' : '⏸️';
+        pauseButton.innerHTML = isPaused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
     }
 }
 
@@ -1566,6 +1566,6 @@ function exitGame() {
     isPaused = false;
     const pauseButton = document.getElementById('pauseButton');
     if (pauseButton) {
-        pauseButton.textContent = '⏸️';
+        pauseButton.innerHTML = '<i class="fas fa-pause"></i>';
     }
 }

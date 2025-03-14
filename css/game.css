@@ -241,6 +241,11 @@
     justify-content: center;
 }
 
+.control-button i {
+    font-size: 1.1em;
+    line-height: 1;
+}
+
 .control-button:hover {
     background-color: rgba(209, 183, 144, 0.8);
     transform: scale(1.1);
@@ -248,4 +253,8 @@
 
 .control-button:active {
     transform: scale(0.95);
+}
+
+.plane-selection ~ .game-controls {
+    display: none;
 }
