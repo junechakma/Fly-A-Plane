@@ -170,9 +170,11 @@ var ModernPlane = function() {
     // Create afterburner effect
     var geomAfterburner = new THREE.CylinderGeometry(5, 8, 10, 8, 1);
     var matAfterburner = new THREE.MeshPhongMaterial({
-        color: Colors.yellow,
+        color: 0xff6600,  // Orange base color
+        emissive: 0xff3300,  // Red-orange glow
+        emissiveIntensity: 1.2,  // Increased glow intensity
         transparent: true,
-        opacity: 0.7,
+        opacity: 0.8,
         shading: THREE.FlatShading
     });
     
@@ -256,6 +258,8 @@ var createAfterburner = function() {
     var geomAfterburner = new THREE.CylinderGeometry(5, 8, 10, 8, 1);
     var matAfterburner = new THREE.MeshPhongMaterial({
         color: Colors.yellow,
+        emissive: Colors.yellow,
+        emissiveIntensity: 0.8,
         transparent: true,
         opacity: 0.7,
         shading: THREE.FlatShading
@@ -267,20 +271,44 @@ var createAfterburner = function() {
 // Update the afterburner effect animation
 ModernPlane.prototype.updateAfterburner = function() {
     // Randomly adjust the opacity for a flame effect
-    var minOpacity = 0.4;
-    var maxOpacity = 0.9;
+    var minOpacity = 0.5;
+    var maxOpacity = 1.0;
     
     // Get the afterburner meshes
     var leftBurner = this.afterburnerLeft.children[0];
     var rightBurner = this.afterburnerRight.children[0];
     
-    // Randomly adjust opacity for flame effect
+    // Randomly adjust opacity and color for flame effect
     if (leftBurner && leftBurner.material) {
         leftBurner.material.opacity = minOpacity + Math.random() * (maxOpacity - minOpacity);
+        // Randomly shift between yellow, orange, and red
+        var colorValue = Math.random();
+        if (colorValue < 0.3) {
+            leftBurner.material.color.setHex(0xffff00);  // Yellow
+            leftBurner.material.emissive.setHex(0xffcc00);
+        } else if (colorValue < 0.6) {
+            leftBurner.material.color.setHex(0xff6600);  // Orange
+            leftBurner.material.emissive.setHex(0xff3300);
+        } else {
+            leftBurner.material.color.setHex(0xff0000);  // Red
+            leftBurner.material.emissive.setHex(0xff0000);
+        }
     }
     
     if (rightBurner && rightBurner.material) {
         rightBurner.material.opacity = minOpacity + Math.random() * (maxOpacity - minOpacity);
+        // Randomly shift between yellow, orange, and red
+        var colorValue = Math.random();
+        if (colorValue < 0.3) {
+            rightBurner.material.color.setHex(0xffff00);  // Yellow
+            rightBurner.material.emissive.setHex(0xffcc00);
+        } else if (colorValue < 0.6) {
+            rightBurner.material.color.setHex(0xff6600);  // Orange
+            rightBurner.material.emissive.setHex(0xff3300);
+        } else {
+            rightBurner.material.color.setHex(0xff0000);  // Red
+            rightBurner.material.emissive.setHex(0xff0000);
+        }
     }
     
     // Randomly adjust the scale for a pulsing effect
@@ -296,13 +324,15 @@ ModernPlane.prototype.updateAfterburner = function() {
 var Bullet = function() {
     var geomBullet = new THREE.SphereGeometry(2, 8, 8);
     var matBullet = new THREE.MeshPhongMaterial({
-        color: Colors.red,  // Changed to red to match obstacles
+        color: Colors.red,
+        emissive: Colors.red,
+        emissiveIntensity: 0.5,
         shading: THREE.FlatShading
     });
     this.mesh = new THREE.Mesh(geomBullet, matBullet);
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
-    this.speed = 0.5; // Reduced from 2 to 0.5 for slower bullets
+    this.speed = 0.5;
     this.active = true;
 };
 
