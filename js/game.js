@@ -84,7 +84,7 @@ var skyThemes = [
 ];
 
 var currentThemeIndex = 0;
-var distanceForThemeChange = 500; // Change theme every 2000 distance units
+var distanceForThemeChange = 900; // Change theme every 2000 distance units
 var themeLastUpdate = 0;
 
 // Function to change the sky theme
@@ -381,7 +381,7 @@ function handleKeyUp(event) {
 }
 
 function updateMousePosFromKeyboard() {
-  const keyboardSensitivity = 0.015;
+  const keyboardSensitivity = 0.013;
   
   if (keyboardControls.up) {
     mousePos.y = Math.min(mousePos.y + keyboardSensitivity, 1);
@@ -1792,7 +1792,7 @@ function playCoinSound() {
             
             // Create a separate gain node for the coin sound
             const coinGainNode = audioContext.createGain();
-            coinGainNode.gain.value = 0.3; // Lower volume for coin sound
+            coinGainNode.gain.value = 0.1; // Lower volume for coin sound
             
             coinSound.connect(coinGainNode);
             coinGainNode.connect(audioContext.destination);
