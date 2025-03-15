@@ -40,7 +40,7 @@
 				border: none;
 				cursor: pointer;
 				transition: all 0.3s ease;
-				margin: 20px 0;
+				margin: 20px 10px;
 			}
 
 			.coffee-btn:hover {
@@ -55,6 +55,15 @@
 				background: none;
 				padding: 0;
 				font-size: 16px;
+			}
+
+			.patreon-btn {
+				background: #FF424D;
+				color: white;
+			}
+
+			.patreon-btn:hover {
+				background: #e23d47;
 			}
 		</style>
 	</head>
@@ -80,9 +89,13 @@
 					</div>
 				</div>
 				<div style="text-align: center;">
-					<button id="coffeeButton" class=" coffee-btn" onclick="window.location.href='donate.html'">
+					<!-- <button id="coffeeButton" class="coffee-btn" onclick="window.open('donate.html', '_self')">
 						<i class="fas fa-coffee"></i>
-						<span class="button-text">Buy me a coffee</span>
+						<span class="button-text">Support</span>
+					</button> -->
+					<button id="patreonButton" class="coffee-btn patreon-btn" onclick="window.open('https://www.patreon.com/june_dev/gift', '_blank')">
+						<i class="fab fa-patreon"></i>
+						<span class="button-text">Buy me a Cofee - Patreon</span>
 					</button>
 				</div>
 				<div class="how-to-play">
@@ -130,7 +143,7 @@
 			<div class="message message--replay" id="replayMessage">Click to Replay</div>
 
 			<div class="game-controls">
-				<button id="coffeeButton" class="control-button" onclick="window.location.href='donate.html'">
+				<button id="coffeeButton" class="control-button" onclick="window.open('https://www.patreon.com/june_dev/gift', '_blank')">
 					<i class="fas fa-coffee"></i>
 				</button>
 				<button id="pauseButton" class="control-button"><i class="fas fa-pause"></i></button>
