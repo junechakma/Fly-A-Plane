@@ -827,13 +827,34 @@ Cloud.prototype.rotate = function(){
   }
 }
 
+// Add this function before the Ennemy constructor
+function getEnemyColorByLevel(level) {
+    switch(level) {
+        case 1:
+            return Colors.red; // Level 1: Red (original)
+        case 2:
+            return Colors.brown; // Level 2: Brown
+        case 3:
+            return Colors.red; // Level 3: Navy
+        case 4:
+            return Colors.brown; // Level 4: Jet Blue
+        case 5:
+            return Colors.red; // Level 5: Dark Grey
+        default:
+            // For levels > 5, cycle through colors with increasing intensity
+            var baseColor = new THREE.Color(Colors.red);
+            var intensity = 1 + (level - 5) * 0.2; // Increase intensity by 20% each level
+            return baseColor.multiplyScalar(intensity).getHex();
+    }
+}
+
 Ennemy = function(){
   var geom = new THREE.TetrahedronGeometry(8,2);
   var mat = new THREE.MeshPhongMaterial({
-    color:Colors.red,
-    shininess:0,
-    specular:0xffffff,
-    shading:THREE.FlatShading
+    color: getEnemyColorByLevel(game.level),
+    shininess: 0,
+    specular: 0xffffff,
+    shading: THREE.FlatShading
   });
   this.mesh = new THREE.Mesh(geom,mat);
   this.mesh.castShadow = true;
@@ -855,6 +876,8 @@ EnnemiesHolder.prototype.spawnEnnemies = function(){
     var ennemy;
     if (ennemiesPool.length) {
       ennemy = ennemiesPool.pop();
+      // Update the enemy color based on current level
+      ennemy.mesh.material.color.setHex(getEnemyColorByLevel(game.level));
     }else{
       ennemy = new Ennemy();
     }
