@@ -1,0 +1,252 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(#e4e0ba, #f7d9aa);
+    font-family: 'Playfair Display', serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    text-align: center;
+}
+
+.game-title {
+    font-size: 4.5em;
+    line-height: 1;
+    margin: 0;
+    letter-spacing: -0.025em;
+    color: #d1b790;
+}
+
+.game-text {
+    font-size: 0.585em;
+    margin: 0.25em 0;
+    letter-spacing: 1em;
+    text-transform: uppercase;
+    color: #d6483b;
+}
+
+.donation-box {
+    background-color: rgba(209, 183, 144, 0.1);
+    border: 2px solid #d1b790;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.score-style {
+    font-size: 26px;
+    font-weight: bold;
+    color: #d1b790;
+    margin-bottom: 15px;
+}
+
+.power-ups {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.power-up-item {
+    background-color: rgba(209, 183, 144, 0.612);
+    border: 1px solid #d1b790;
+    padding: 10px;
+    color: #ccaa76;
+    font-size: 0.9em;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.power-up-item:hover {
+    background-color: rgba(209, 183, 144, 0.8);
+    transform: scale(1.1);
+}
+
+.game-button {
+    padding: 0.4em 1em;
+    font-size: 1.2em;
+    background-color: rgba(209, 183, 144, 0.612);
+    border: 1px solid #d1b790;
+    border-radius: 4px;
+    color: #ccaa76;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+}
+
+.game-button:hover {
+    background-color: rgba(209, 183, 144, 0.8);
+    transform: scale(1.1);
+}
+
+/* Stripe button customization */
+stripe-buy-button {
+    --button-height: 50px;
+    --button-radius: 4px;
+    --button-border-color: #d1b790;
+    --button-text-color: #ccaa76;
+    --button-background-color: rgba(209, 183, 144, 0.612);
+    margin: 20px auto;
+    display: block;
+}
+
+@media screen and (max-width: 40em) {
+    .game-title {
+        font-size: 3em;
+    }
+    
+    .power-ups {
+        grid-template-columns: 1fr;
+    }
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    margin-bottom: 40px;
+}
+
+nav a {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+nav a:hover {
+    color: #0066cc;
+}
+
+.donation-content {
+    background-color: white;
+    border-radius: 10px;
+    padding: 40px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    text-align: center;
+}
+
+.description {
+    text-align: center;
+    font-size: 1.2em;
+    color: #666;
+    margin-bottom: 40px;
+}
+
+.donation-box h2 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.donate-button {
+    display: inline-block;
+    background-color: #0066cc;
+    color: white;
+    padding: 15px 40px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.donate-button:hover {
+    background-color: #0052a3;
+}
+
+.benefits {
+    margin-top: 40px;
+}
+
+.benefits h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.benefits ul {
+    list-style-type: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 0 20px;
+}
+
+.benefits li {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    color: #666;
+}
+
+@media (max-width: 768px) {
+    .donation-content {
+        padding: 20px;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
+    
+    .benefits ul {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stripe-button {
+    padding: 0.4em 1em;
+    font-size: 1.2em;
+    background-color: rgba(209, 183, 144, 0.612);
+    border: 1px solid #d1b790;
+    border-radius: 4px;
+    color: #9f6a19;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin: 20px auto;
+}
+
+.stripe-button:hover {
+    background-color: rgba(209, 183, 144, 0.8);
+    transform: scale(1.1);
+}
+
+.stripe-button:active {
+    transform: scale(0.95);
+} 
